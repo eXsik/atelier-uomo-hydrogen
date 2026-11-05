@@ -437,12 +437,14 @@ export function FilterDrawer({
   extraHiddenInputs?: ReactNode;
   id?: string;
 }) {
+  // The browser may open this native dialog before React hydrates.
   return (
     <dialog
       id={id}
       className="drawer-left bg-surface text-on-surface"
       aria-labelledby="filter-drawer-title"
       closedby="any"
+      suppressHydrationWarning
     >
       <div className="flex h-full flex-col">
         <div className="flex shrink-0 items-center py-2 ps-4">

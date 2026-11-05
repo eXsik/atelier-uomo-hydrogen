@@ -7,6 +7,7 @@ import {
 } from "~/lib/cart-drawer";
 
 export function MobileNav() {
+  // The browser may open this native dialog before React hydrates.
   return (
     <dialog
       id={MOBILE_NAV_DRAWER_ID}
@@ -14,6 +15,7 @@ export function MobileNav() {
       aria-labelledby="mobile-nav-title"
       data-testid="mobile-nav"
       closedby="any"
+      suppressHydrationWarning
     >
       <div className="flex h-full flex-col">
         <div className="relative flex min-h-touch-target shrink-0 items-center px-4 py-1">

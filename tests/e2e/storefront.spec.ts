@@ -162,6 +162,13 @@ test("customer can search for a product", async ({ page }) => {
 });
 
 test("mobile menu navigates to collections", async ({ page }) => {
+  const hydrationWarnings: string[] = [];
+  page.on("console", (message) => {
+    if (message.type() === "error" && message.text().includes("hydrated")) {
+      hydrationWarnings.push(message.text());
+    }
+  });
+
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
 
@@ -182,4 +189,5 @@ test("mobile menu navigates to collections", async ({ page }) => {
   await expect(
     page.getByRole("main").getByTestId("collection-card").first(),
   ).toBeVisible();
+  expect(hydrationWarnings).toEqual([]);
 });

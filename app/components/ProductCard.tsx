@@ -60,11 +60,11 @@ export function ProductCard({ product, priority = false }: ProductCardProps) {
 
   return (
     <article
-      className="group card flex flex-col gap-2"
+      className="product-editorial group card flex flex-col gap-2"
       aria-label={product.title}
       data-testid="product-card"
     >
-      <div className="rounded-card bg-surface-secondary relative block aspect-square overflow-hidden">
+      <div className="product-editorial-image rounded-card bg-surface-secondary relative block aspect-square overflow-hidden">
         {primaryImage ? (
           <div className="h-full w-full motion-safe:transition-transform motion-safe:duration-300 motion-safe:group-hover:scale-[1.04]">
             <img

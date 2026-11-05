@@ -8,8 +8,7 @@
  * It does NOT own the open/close MOTION or the body scroll lock — those are
  * app-owned and live here.
  *
- * Do NOT add web fonts or @theme font overrides here: the core tokens lock the
- * example typography to system-ui.
+ * Atelier Uomo typography is locally hosted and defined below.
  */
 
 /* Drawer slide-in animation.
@@ -86,70 +85,530 @@ body:has(.drawer-left[open]) {
   overflow: hidden;
 }
 
-/* Atelier Uomo: quiet typography, forest green, and an editorial split hero. */
+/* Locally hosted type; no third-party font requests during browsing. */
+@font-face {
+  font-family: "Cormorant Garamond";
+  src: url("/fonts/cormorant-garamond-regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Manrope";
+  src: url("/fonts/manrope-regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --atelier-wine: #653e43;
+  --atelier-stone: #deded5;
+}
+html {
+  scroll-padding-top: 6rem;
+}
+body {
+  -webkit-font-smoothing: antialiased;
+}
+.page-shell {
+  width: min(100%, 1440px);
+  margin-inline: auto;
+  padding-inline: clamp(20px, 4vw, 64px);
+}
+.atelier-demo-note {
+  background: #e9e9e3;
+  color: #55594d;
+  font-size: 10px;
+  letter-spacing: 0.025em;
+}
+.atelier-header {
+  border-bottom-color: var(--color-border);
+}
+.header-layout {
+  height: 78px;
+}
 .brand-wordmark {
-  font-family: Georgia, "Times New Roman", serif;
-  letter-spacing: -0.035em;
-}
-.atelier-hero {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: clamp(2rem, 6vw, 6rem);
-  padding-block: clamp(2rem, 5vw, 5rem);
-  align-items: center;
-}
-.atelier-hero-copy {
-  padding-block: 2rem;
-}
-.atelier-hero h1 {
   font-family: var(--font-heading);
-  font-size: clamp(3rem, 5.5vw, 5.5rem);
-  line-height: 1.04;
-  letter-spacing: -0.045em;
-  max-width: 10ch;
-  margin-block: 1.5rem;
-  text-wrap: balance;
+  font-size: 29px;
+  letter-spacing: -0.055em;
+  font-weight: 400;
 }
-.atelier-hero-description {
-  max-width: 34ch;
-  line-height: 1.75;
-  margin-bottom: 2rem;
-  color: var(--color-on-surface-secondary);
+.header-layout nav {
+  gap: 28px;
 }
-.atelier-hero-image {
-  display: block;
+.header-edit-link {
+  font-size: 13px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.header-layout a:hover {
+  color: var(--atelier-wine);
+}
+.campaign-masthead {
+  font-family: var(--font-heading);
+  font-size: clamp(56px, 13.4vw, 192px);
+  line-height: 0.98;
+  letter-spacing: -0.065em;
+  text-align: center;
+  white-space: nowrap;
+  padding-block: 22px 30px;
+  font-weight: 400;
+}
+.campaign-grid {
+  display: grid;
+  grid-template-columns: 1.45fr 1fr;
+  min-height: 580px;
+}
+.campaign-photograph {
   position: relative;
   min-width: 0;
-  aspect-ratio: 4 / 5;
-  overflow: hidden;
+  margin: 0;
+  background: var(--atelier-stone);
 }
-.atelier-hero-image img {
+.campaign-photograph img {
   width: 100%;
   height: 100%;
+  max-height: 700px;
   object-fit: cover;
+  object-position: 65% 45%;
 }
-.atelier-hero-caption {
+.campaign-photograph figcaption {
   position: absolute;
-  bottom: 1rem;
-  left: 1rem;
-  right: 1rem;
-  padding: 1rem;
-  color: var(--color-on-surface);
-  background: var(--color-surface);
-  font-size: 0.875rem;
+  bottom: 22px;
+  left: 24px;
+  color: white;
+  font-size: 12px;
+  text-shadow: 0 1px 5px #000;
+}
+.campaign-story {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 48px clamp(28px, 5vw, 76px);
+  background: #e8e9e1;
+}
+.editorial-kicker {
+  font-size: 12px;
+  line-height: 1.6;
+  font-weight: 400;
+}
+.campaign-story h1 {
+  font-family: var(--font-heading);
+  font-weight: 400;
+  font-size: clamp(56px, 6.1vw, 88px);
+  letter-spacing: -0.045em;
+  line-height: 0.98;
+  margin-block: 30px;
+}
+.campaign-description {
+  font-size: 13px;
+  line-height: 1.95;
+  color: var(--color-on-surface-secondary);
+}
+.editorial-link {
+  display: inline-flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 44px;
+  gap: 30px;
+  padding-block: 8px;
+  border-bottom: 1px solid currentColor;
+  font-size: 12px;
+  text-decoration: none;
+}
+.campaign-story > .editorial-link {
+  margin-top: 32px;
+}
+.editorial-link span {
+  font-size: 21px;
+}
+.editorial-link:hover {
+  color: var(--atelier-wine);
+}
+.campaign-note {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  border-top: 1px solid #c6c9bd;
+  margin-top: 64px;
+  padding-top: 22px;
+  width: 100%;
+}
+.atelier-symbol {
+  font-family: var(--font-heading);
+  font-size: 43px;
+  letter-spacing: -0.09em;
+  color: var(--atelier-wine);
+}
+.campaign-note p {
+  font-size: 11px;
+  color: var(--color-on-surface-secondary);
+  line-height: 1.8;
+}
+.campaign-caption {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  font-size: 10px;
+  color: var(--color-on-surface-secondary);
+  padding-block: 18px;
+  border-bottom: 1px solid var(--color-border);
+}
+.current-edit {
+  padding-block: 90px 100px;
+  scroll-margin-top: 4rem;
+}
+.edit-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 24px;
+  margin-bottom: 36px;
+}
+.editorial-heading {
+  font-family: var(--font-heading);
+  font-size: clamp(42px, 4.7vw, 68px);
+  line-height: 1.05;
+  letter-spacing: -0.045em;
+  font-weight: 400;
+}
+.edit-heading > a {
+  font-size: 11px;
+}
+.edit-product-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 22px;
+}
+.product-editorial {
+  gap: 15px;
+}
+.product-editorial .product-editorial-image {
+  aspect-ratio: 3 / 4;
+  background: #e9e9e3;
+}
+.product-editorial .product-editorial-image img {
+  mix-blend-mode: multiply;
+  object-fit: contain;
+}
+.product-editorial h3 {
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+.product-editorial > div:last-child {
+  gap: 7px;
+}
+.product-editorial > div:last-child > div {
+  font-size: 11px;
+  color: var(--color-on-surface-secondary);
+}
+.product-editorial > div:last-child > div span {
+  font-weight: 400;
+}
+.product-editorial .badge-soldout,
+.product-editorial .badge-sale {
+  border-radius: 0;
+  font-size: 10px;
+  font-weight: 400;
+  padding: 5px 8px;
+}
+.atelier-manifesto {
+  background: var(--atelier-wine);
+  color: #faf8f2;
+}
+.manifesto-layout {
+  display: grid;
+  grid-template-columns: 0.7fr 1.7fr 1fr;
+  gap: 48px;
+  align-items: center;
+  padding-block: 80px;
+}
+.manifesto-layout h2 {
+  font-family: var(--font-heading);
+  font-size: clamp(42px, 4.7vw, 68px);
+  line-height: 1.04;
+  letter-spacing: -0.035em;
+}
+.manifesto-layout > p:last-child {
+  max-width: 30ch;
+  font-size: 12px;
+  line-height: 1.95;
+  color: #eee2df;
+}
+.collection-index {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  padding-block: 110px;
+}
+.collection-intro .editorial-heading {
+  margin-block: 22px;
+}
+.collection-intro > p:last-child {
+  font-size: 12px;
+  color: var(--color-on-surface-secondary);
+}
+.collection-list-link {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: center;
+  padding-block: 20px;
+  border-bottom: 1px solid var(--color-border);
+  font-family: var(--font-heading);
+  font-size: 42px;
+  letter-spacing: -0.04em;
+  text-decoration: none;
+}
+.collection-list-link:first-child {
+  border-top: 1px solid var(--color-border);
+}
+.collection-list-link span:last-child {
+  font-family: var(--font-body);
+  font-size: 24px;
+}
+.collection-list-link:hover {
+  color: var(--atelier-wine);
+  padding-inline: 10px;
+}
+.collection-list > .editorial-link {
+  margin-top: 20px;
+}
+.atelier-footer {
+  background: #e9e9e1;
+  padding-block: 64px 22px;
+}
+.footer-top {
+  display: grid;
+  grid-template-columns: 1.5fr 0.7fr 1fr;
+  gap: 50px;
+}
+.footer-top h2 {
+  font-family: var(--font-heading);
+  font-size: 47px;
+  line-height: 1.05;
+  letter-spacing: -0.035em;
+  margin-top: 18px;
+}
+.footer-nav {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.footer-nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: 12px;
+  text-decoration: none;
+}
+.footer-nav a:hover {
+  text-decoration: underline;
+}
+.footer-project-note {
+  font-size: 11px;
+  color: var(--color-on-surface-secondary);
+  line-height: 1.9;
+}
+.footer-wordmark {
+  font-family: var(--font-heading);
+  font-size: clamp(54px, 13.4vw, 192px);
+  white-space: nowrap;
+  text-align: center;
+  letter-spacing: -0.065em;
+  line-height: 1;
+  margin-block: 64px 26px;
+}
+.footer-bottom {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  font-size: 10px;
+  padding-top: 20px;
+  border-top: 1px solid #c9ccbf;
+}
+a:focus-visible,
+button:focus-visible {
+  outline-offset: 5px;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .editorial-link,
+  .collection-list-link {
+    transition:
+      color 180ms ease,
+      padding 180ms ease;
+  }
+}
+@media (min-width: 1440px) {
+  .campaign-masthead,
+  .footer-wordmark {
+    font-size: 192px;
+  }
+}
+@media (max-width: 1000px) {
+  .campaign-grid {
+    grid-template-columns: 1.2fr 1fr;
+    min-height: 520px;
+  }
+  .campaign-story {
+    padding: 30px;
+  }
+  .campaign-note {
+    margin-top: 40px;
+  }
+  .manifesto-layout {
+    grid-template-columns: 1fr 2fr;
+    gap: 30px;
+  }
+  .manifesto-layout > p:last-child {
+    grid-column: 2;
+  }
+  .edit-product-grid {
+    gap: 16px;
+  }
 }
 @media (max-width: 767px) {
-  .atelier-hero {
+  .header-layout {
+    height: 64px;
+  }
+  .brand-wordmark {
+    font-size: 25px;
+  }
+  .header-layout > div:first-child {
+    padding-inline-end: 0;
+  }
+  .header-layout > div:last-child > a[aria-label="Account"] {
+    display: none;
+  }
+  .atelier-demo-note {
+    font-size: 9px;
+  }
+  .campaign-masthead {
+    font-size: clamp(50px, 13.5vw, 104px);
+    padding-block: 20px;
+  }
+  .campaign-grid {
     grid-template-columns: 1fr;
-    gap: 1.5rem;
   }
-  .atelier-hero-copy {
-    padding-block: 0;
+  .campaign-photograph {
+    aspect-ratio: 4 / 4.7;
   }
-  .atelier-hero h1 {
-    font-size: clamp(3rem, 11vw, 4.5rem);
+  .campaign-photograph img {
+    height: 100%;
+    object-position: 60% center;
   }
-  .atelier-hero-image {
-    aspect-ratio: 5 / 4;
+  .campaign-story {
+    padding: 34px 26px;
+  }
+  .campaign-story h1 {
+    font-size: 64px;
+    margin-block: 22px;
+  }
+  .campaign-story > .editorial-link {
+    margin-top: 22px;
+  }
+  .campaign-note {
+    margin-top: 28px;
+    padding-top: 16px;
+  }
+  .campaign-caption {
+    font-size: 9px;
+  }
+  .campaign-caption span:last-child {
+    display: none;
+  }
+  .current-edit {
+    padding-block: 56px;
+  }
+  .edit-heading {
+    align-items: start;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .edit-product-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 12px;
+    row-gap: 30px;
+  }
+  .product-editorial h3 {
+    font-size: 12px;
+  }
+  .manifesto-layout {
+    grid-template-columns: 1fr;
+    gap: 24px;
+    padding-block: 48px;
+  }
+  .manifesto-layout > p:last-child {
+    grid-column: auto;
+    max-width: 38ch;
+  }
+  .collection-index {
+    grid-template-columns: 1fr;
+    gap: 36px;
+    padding-block: 56px;
+  }
+  .collection-list-link {
+    font-size: 36px;
+  }
+  .footer-top {
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+  }
+  .footer-top > div:first-child {
+    grid-column: 1 / -1;
+  }
+  .footer-top h2 {
+    font-size: 42px;
+  }
+  .footer-wordmark {
+    margin-top: 46px;
+    font-size: 13.5vw;
+  }
+  .footer-bottom {
+    flex-wrap: wrap;
+    line-height: 1.6;
+  }
+  .footer-bottom span:nth-child(2) {
+    display: none;
+  }
+}
+
+/* Carry the editorial language through product details and mobile navigation. */
+.product-page h1 {
+  font-family: var(--font-heading);
+  font-size: clamp(42px, 4.8vw, 68px);
+  letter-spacing: -0.04em;
+  line-height: 1.05;
+}
+.product-page .product-grid {
+  padding-top: 32px;
+}
+.product-page .related-products-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 22px;
+}
+[data-testid="mobile-nav"] nav a {
+  font-family: var(--font-heading);
+  font-size: 34px;
+  min-height: 64px;
+  border-bottom: 1px solid var(--color-border);
+}
+@media (min-width: 768px) {
+  .product-page .product-grid > div:last-child {
+    top: 110px;
+  }
+}
+@media (max-width: 767px) {
+  .product-page .product-grid {
+    padding-top: 16px;
+  }
+  .product-page .related-products-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px 12px;
   }
 }

@@ -1,68 +1,43 @@
 import { Link } from "react-router";
-
 import type { StorefrontShop } from "~/lib/storefront-shop";
-
-import { PaymentMethodIcon } from "./PaymentMethodIcon";
-
-const linkClass =
-  "min-h-touch-target text-on-surface-secondary hover:text-on-surface focus-visible:outline-accent inline-flex items-center font-normal no-underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 motion-safe:transition-colors";
 
 export function Footer({ shopInfo }: { shopInfo: StorefrontShop }) {
   return (
-    <footer className="max-w-page px-margin mx-auto w-full">
-      <div
-        className={`border-border grid grid-cols-1 gap-8 border-t py-12 text-sm md:grid-cols-2 ${shopInfo.paymentMethods.length > 0 ? "lg:grid-cols-3" : ""}`}
-      >
-        <div className="min-w-0 wrap-anywhere">
-          <h2 className="type-body-sm text-on-surface mb-4 font-medium">
-            {shopInfo.name}
-          </h2>
-          <p className="text-on-surface-secondary max-w-xs leading-relaxed">
-            A study in everyday menswear. A portfolio storefront built with
-            Shopify Hydrogen.
+    <footer className="atelier-footer">
+      <div className="page-shell">
+        <div className="footer-top">
+          <div>
+            <p className="editorial-kicker">An individual point of view</p>
+            <h2>
+              Well dressed.
+              <br />
+              Entirely yourself.
+            </h2>
+          </div>
+          <nav aria-label="Footer navigation" className="footer-nav">
+            <Link to="/collections">The collection</Link>
+            <Link to="/search">Find a piece</Link>
+            <Link to="/cart">Your bag</Link>
+            <Link to="/account">Your account</Link>
+          </nav>
+          <p className="footer-project-note">
+            An independent menswear concept.
+            <br />
+            Built as a portfolio storefront.
+            <br />
+            Demo catalog by mock.shop.
           </p>
         </div>
-        <nav aria-labelledby="footer-customer-care-heading">
-          <h2
-            className="type-body-sm text-on-surface mb-4 font-medium"
-            id="footer-customer-care-heading"
-          >
-            Customer care
-          </h2>
-          <ul role="list" className="flex flex-col gap-2">
-            <li>
-              <Link to="/search" className={linkClass}>
-                Search
-              </Link>
-            </li>
-            <li>
-              <Link to="/cart" className={linkClass}>
-                Cart
-              </Link>
-            </li>
-          </ul>
-        </nav>
-        {shopInfo.paymentMethods.length > 0 ? (
-          <div>
-            <h2
-              id="footer-payment-methods-heading"
-              className="type-body-sm text-on-surface mb-4 font-medium"
-            >
-              Payment methods
-            </h2>
-            <ul
-              role="list"
-              aria-labelledby="footer-payment-methods-heading"
-              className="flex flex-wrap items-center gap-2"
-            >
-              {shopInfo.paymentMethods.map((method) => (
-                <li key={method} className="max-w-full">
-                  <PaymentMethodIcon method={method} />
-                </li>
-              ))}
-            </ul>
-          </div>
-        ) : null}
+        <p className="footer-wordmark" aria-label={shopInfo.name}>
+          Atelier Uomo
+        </p>
+        <div className="footer-bottom">
+          <span>
+            © {new Date().getUTCFullYear()} {shopInfo.name}
+          </span>
+          <span>A considered wardrobe. A personal style.</span>
+          <a href="#main-content">Back to top ↑</a>
+        </div>
       </div>
     </footer>
   );

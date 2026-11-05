@@ -40,7 +40,16 @@ export function MobileNav() {
                   className="min-h-touch-target text-on-surface flex items-center rounded-sm text-xl font-normal no-underline hover:opacity-70 motion-safe:transition-opacity"
                   onClick={() => closeMobileNavDrawer()}
                 >
-                  Collections
+                  The collection
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/#the-edit"
+                  className="min-h-touch-target text-on-surface flex items-center py-3 text-xl"
+                  onClick={() => closeMobileNavDrawer()}
+                >
+                  The edit
                 </Link>
               </li>
             </ul>

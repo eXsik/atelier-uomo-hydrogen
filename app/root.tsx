@@ -12,10 +12,7 @@ import {
   useRouteLoaderData,
 } from "react-router";
 
-import {
-  CartAnalyticsTracker,
-  PageViewedTracker,
-} from "~/components/AnalyticsTrackers";
+import { CartAnalyticsTracker, PageViewedTracker } from "~/components/AnalyticsTrackers";
 import { AnnouncementBar } from "~/components/AnnouncementBar";
 import { CartDrawer } from "~/components/CartDrawer";
 import { Footer } from "~/components/Footer";
@@ -23,10 +20,7 @@ import { Header } from "~/components/Header";
 import { SearchDrawer } from "~/components/SearchDrawer";
 import { CartProvider } from "~/lib/cart";
 import { cartHandlers } from "~/lib/cart-handlers";
-import {
-  createRequestCustomerAccount,
-  customerAccountContext,
-} from "~/lib/customer-account";
+import { createRequestCustomerAccount, customerAccountContext } from "~/lib/customer-account";
 import { envContext } from "~/lib/env";
 import { predictiveSearchHandlers } from "~/lib/predictive-search-handlers";
 import { loadRootLayout } from "~/lib/root-layout";
@@ -50,6 +44,20 @@ import appStylesHref from "./app.css?url";
 
 export const links: Route.LinksFunction = () => [
   { rel: "stylesheet", href: appStylesHref },
+  {
+    rel: "preload",
+    href: "/fonts/cormorant-garamond-regular.ttf",
+    as: "font",
+    type: "font/ttf",
+    crossOrigin: "anonymous",
+  },
+  {
+    rel: "preload",
+    href: "/fonts/manrope-regular.ttf",
+    as: "font",
+    type: "font/ttf",
+    crossOrigin: "anonymous",
+  },
   { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
 ];
 
@@ -63,14 +71,9 @@ export const middleware: Route.MiddlewareFunction[] = [
       context.waitUntil,
     );
     const requestContext = storefrontClient.requestContext;
-    const customerAccount = await createRequestCustomerAccount(
-      request,
-      env,
-      requestContext,
-    );
+    const customerAccount = await createRequestCustomerAccount(request, env, requestContext);
     const sessionManager =
-      customerAccount?.customerAccount.sessionManager ??
-      createEphemeralSessionManager(request);
+      customerAccount?.customerAccount.sessionManager ?? createEphemeralSessionManager(request);
 
     const shopifyRoute = handleShopifyRoutes({
       request,
@@ -87,17 +90,11 @@ export const middleware: Route.MiddlewareFunction[] = [
 
     context.set(storefrontClientContext, storefrontClient);
     context.set(storefrontRequestContext, requestContext);
-    context.set(
-      customerAccountContext,
-      customerAccount?.customerAccount ?? null,
-    );
+    context.set(customerAccountContext, customerAccount?.customerAccount ?? null);
 
     const response = await next();
-    const sessionHeaders = new Headers(
-      (await sessionManager.commit?.()) ?? undefined,
-    );
-    for (const [name, value] of sessionHeaders)
-      response.headers.append(name, value);
+    const sessionHeaders = new Headers((await sessionManager.commit?.()) ?? undefined);
+    for (const [name, value] of sessionHeaders) response.headers.append(name, value);
     if (response.status === 404) {
       const redirect = await handleShopifyRedirects({
         request,
@@ -192,9 +189,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   if (isRouteErrorResponse(error)) {
     message = error.status === 404 ? "404" : "Error";
     details =
-      error.status === 404
-        ? "The requested page could not be found."
-        : error.statusText || details;
+      error.status === 404 ? "The requested page could not be found." : error.statusText || details;
   } else if (import.meta.env.DEV && error && error instanceof Error) {
     details = error.message;
     stack = error.stack;

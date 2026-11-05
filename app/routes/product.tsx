@@ -768,7 +768,7 @@ function RelatedProducts({ products }: { products: RelatedProduct[] }) {
         <div className="max-w-page px-margin mx-auto contain-paint">
           <ul
             role="list"
-            className="grid grid-cols-1 gap-x-1 gap-y-10 md:grid-cols-2 lg:grid-cols-4"
+            className="related-products-grid"
           >
             {products.map((product) => (
               <li key={product.handle}>
@@ -807,7 +807,7 @@ export default function ProductRoute({ loaderData }: Route.ComponentProps) {
       }}
     >
       <ProductViewedTracker product={product} />
-      <main className="flex-1" id="main-content" tabIndex={-1}>
+      <main className="product-page flex-1" id="main-content" tabIndex={-1}>
         <ProductPageContent product={product} />
         <RelatedProducts products={relatedProducts} />
       </main>

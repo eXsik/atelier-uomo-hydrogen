@@ -1,12 +1,16 @@
-import { gql, parseCollectionParams, type StorefrontApi } from "@shopify/hydrogen";
+import {
+  gql,
+  parseCollectionParams,
+  type StorefrontApi,
+} from "@shopify/hydrogen";
 import type { StorefrontClient } from "@shopify/hydrogen";
 import type { ProductFilter as StorefrontApiProductFilter } from "@shopify/hydrogen/storefront-api-types";
 
 import { PRODUCT_CARD_FRAGMENT } from "~/components/ProductCard";
 
-export const COLLECTION_PAGE_SIZE = 9;
+const COLLECTION_PAGE_SIZE = 9;
 
-export const COLLECTION_QUERY = gql(
+const COLLECTION_QUERY = gql(
   `
     query CollectionPage(
       $handle: String!
@@ -74,7 +78,9 @@ export const COLLECTION_QUERY = gql(
   [PRODUCT_CARD_FRAGMENT],
 );
 
-type CollectionQueryVariables = StorefrontApi.VariablesOf<typeof COLLECTION_QUERY>;
+type CollectionQueryVariables = StorefrontApi.VariablesOf<
+  typeof COLLECTION_QUERY
+>;
 
 export async function loadCollectionPage({
   storefrontClient,
@@ -94,14 +100,19 @@ export async function loadCollectionPage({
     first: COLLECTION_PAGE_SIZE,
     after,
     filters:
-      browse.filters.length > 0 ? (browse.filters as StorefrontApiProductFilter[]) : undefined,
+      browse.filters.length > 0
+        ? (browse.filters as StorefrontApiProductFilter[])
+        : undefined,
     sortKey: browse.sortKey,
     reverse: browse.reverse || undefined,
   };
 
-  const { data } = await storefrontClient.graphql(COLLECTION_QUERY, { variables });
+  const { data } = await storefrontClient.graphql(COLLECTION_QUERY, {
+    variables,
+  });
 
-  if (!data?.collection) throw new Response("Collection not found", { status: 404 });
+  if (!data?.collection)
+    throw new Response("Collection not found", { status: 404 });
 
   return {
     collection: data.collection,

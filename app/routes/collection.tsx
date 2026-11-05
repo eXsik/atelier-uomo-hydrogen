@@ -1,21 +1,28 @@
 import { AnalyticsEvent, getSortByValue } from "@shopify/hydrogen";
 import { CollectionProvider } from "@shopify/hydrogen/react";
 import { useEffect } from "react";
-import { Link, useLocation, useNavigate, useNavigation, useSearchParams } from "react-router";
+import {
+  Link,
+  useLocation,
+  useNavigate,
+  useNavigation,
+  useSearchParams,
+} from "react-router";
 
 import {
   ActiveFilterChips,
   COLLECTION_SORT_OPTIONS,
-  FacetForm,
-  FilterDrawer,
-  LoadMore,
   Toolbar,
-  useLoadMore,
 } from "~/components/CollectionBrowse";
+import { FacetForm, FilterDrawer } from "~/components/CollectionFacets";
+import { LoadMore, useLoadMore } from "~/components/CollectionPagination";
 import { ProductCard } from "~/components/ProductCard";
 import { loadCollectionPage } from "~/lib/collection";
 import { storefrontClientContext } from "~/lib/storefront";
-import { formatPageTitle, getShopNameFromRootMatch } from "~/lib/storefront-shop";
+import {
+  formatPageTitle,
+  getShopNameFromRootMatch,
+} from "~/lib/storefront-shop";
 
 import type { Route } from "./+types/collection";
 
@@ -41,7 +48,11 @@ export async function loader({ context, params, request }: Route.LoaderArgs) {
 type CollectionData = Route.ComponentProps["loaderData"]["collection"];
 type ProductNode = Route.ComponentProps["loaderData"]["products"][number];
 
-function CollectionViewedTracker({ collection }: { collection: CollectionData }) {
+function CollectionViewedTracker({
+  collection,
+}: {
+  collection: CollectionData;
+}) {
   useEffect(() => {
     window.Shopify?.analytics?.publish(AnalyticsEvent.COLLECTION_VIEWED, {
       collection: {
@@ -54,7 +65,13 @@ function CollectionViewedTracker({ collection }: { collection: CollectionData })
   return null;
 }
 
-function BreadcrumbJsonLd({ collection, origin }: { collection: CollectionData; origin: string }) {
+function BreadcrumbJsonLd({
+  collection,
+  origin,
+}: {
+  collection: CollectionData;
+  origin: string;
+}) {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -80,11 +97,11 @@ function BreadcrumbJsonLd({ collection, origin }: { collection: CollectionData; 
 function Breadcrumb({ collection }: { collection: CollectionData }) {
   return (
     <nav aria-label="Breadcrumb" className="mb-6">
-      <ol className="text-on-surface-secondary flex items-center gap-1.5 text-sm">
+      <ol className="flex items-center gap-1.5 text-sm text-on-surface-secondary">
         <li>
           <Link
             to="/"
-            className="hover:text-on-surface rounded-sm py-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current motion-safe:transition-colors"
+            className="rounded-sm py-2 hover:text-on-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current motion-safe:transition-colors"
           >
             Home
           </Link>
@@ -93,7 +110,7 @@ function Breadcrumb({ collection }: { collection: CollectionData }) {
           /
         </li>
         <li>
-          <span aria-current="page" className="text-on-surface font-medium">
+          <span aria-current="page" className="font-medium text-on-surface">
             {collection.title}
           </span>
         </li>
@@ -107,15 +124,17 @@ function CollectionHeader({ collection }: { collection: CollectionData }) {
     <div className="mb-8">
       <div className="grid gap-6 md:grid-cols-[1fr_16rem] md:items-start">
         <div>
-          <h1 className="type-display text-on-surface mb-2">{collection.title}</h1>
+          <h1 className="type-display mb-2 text-on-surface">
+            {collection.title}
+          </h1>
           {collection.description ? (
-            <div className="richtext text-on-surface-secondary type-body-sm max-w-2xl">
+            <div className="richtext type-body-sm max-w-2xl text-on-surface-secondary">
               <p>{collection.description}</p>
             </div>
           ) : null}
         </div>
         {collection.image ? (
-          <div className="bg-surface-secondary aspect-landscape rounded-card overflow-hidden">
+          <div className="aspect-landscape overflow-hidden rounded-card bg-surface-secondary">
             <img
               src={collection.image.url}
               alt={collection.image.altText ?? collection.title}
@@ -155,15 +174,15 @@ function ProductGrid({ products }: { products: readonly ProductNode[] }) {
 
 function EmptyState({ collectionPath }: { collectionPath: string }) {
   return (
-    <div className="border-border bg-surface-secondary rounded-card border p-8 text-center">
+    <div className="rounded-card border border-border bg-surface-secondary p-8 text-center">
       <h2 className="type-heading-md text-on-surface">No products found</h2>
-      <p className="text-on-surface-secondary mt-2 text-sm">
+      <p className="mt-2 text-sm text-on-surface-secondary">
         Try removing filters to see more products in this collection.
       </p>
       <Link
         to={collectionPath}
         preventScrollReset
-        className="rounded-button button-primary focus-visible:outline-accent mt-6 inline-flex h-11 items-center justify-center px-4 text-sm font-medium no-underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 motion-safe:transition-[color,background-color,border-color,transform] motion-safe:active:scale-[0.97]"
+        className="button-primary mt-6 inline-flex h-11 items-center justify-center rounded-button px-4 text-sm font-medium no-underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent motion-safe:transition-[color,background-color,border-color,transform] motion-safe:active:scale-[0.97]"
       >
         Clear all filters
       </Link>
@@ -171,7 +190,11 @@ function EmptyState({ collectionPath }: { collectionPath: string }) {
   );
 }
 
-function CollectionResults({ loaderData }: { loaderData: Route.ComponentProps["loaderData"] }) {
+function CollectionResults({
+  loaderData,
+}: {
+  loaderData: Route.ComponentProps["loaderData"];
+}) {
   const location = useLocation();
   const navigation = useNavigation();
   const isUpdating =
@@ -230,10 +253,15 @@ export default function CollectionRoute({ loaderData }: Route.ComponentProps) {
   const [searchParams] = useSearchParams();
   return (
     <CollectionProvider
-      data={{ handle: loaderData.collection.handle, dataSearch: loaderData.dataSearch }}
+      data={{
+        handle: loaderData.collection.handle,
+        dataSearch: loaderData.dataSearch,
+      }}
       urlSearch={searchParams.toString()}
       onChange={(search) => {
-        const nextParams = new URLSearchParams(search.startsWith("?") ? search.slice(1) : search);
+        const nextParams = new URLSearchParams(
+          search.startsWith("?") ? search.slice(1) : search,
+        );
         nextParams.delete("after");
         const nextSearch = nextParams.toString();
         void navigate(
@@ -247,14 +275,19 @@ export default function CollectionRoute({ loaderData }: Route.ComponentProps) {
     >
       <CollectionViewedTracker collection={loaderData.collection} />
       <main className="flex-1" id="main-content" tabIndex={-1}>
-        <div className="max-w-page px-margin mx-auto w-full py-8 md:py-12">
-          <BreadcrumbJsonLd collection={loaderData.collection} origin={loaderData.origin} />
+        <div className="mx-auto w-full max-w-page px-margin py-8 md:py-12">
+          <BreadcrumbJsonLd
+            collection={loaderData.collection}
+            origin={loaderData.origin}
+          />
           <Breadcrumb collection={loaderData.collection} />
           <CollectionHeader collection={loaderData.collection} />
           <div className="lg:grid lg:grid-cols-[15rem_1fr] lg:gap-10">
             <aside className="hidden lg:block" aria-label="Filters">
               <div className="sticky top-8">
-                <h2 className="type-heading-sm text-on-surface mb-2">Filters</h2>
+                <h2 className="type-heading-sm mb-2 text-on-surface">
+                  Filters
+                </h2>
                 <FacetForm
                   availableFilters={loaderData.availableFilters}
                   currencyCode={loaderData.currencyCode}

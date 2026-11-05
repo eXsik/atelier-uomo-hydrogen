@@ -1,0 +1,10 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema-jsonc.json",
+  "entry": ["server.ts", "tests/**/*.{ts,tsx}"],
+  "project": [
+    "app/**/*.{css,js,jsx,ts,tsx}",
+    "tests/**/*.{js,jsx,ts,tsx}",
+    "*.{js,jsx,ts,tsx}",
+  ],
+  "ignoreDependencies": ["gql.tada", "graphql"],
+}

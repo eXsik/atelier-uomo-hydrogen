@@ -23,6 +23,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Check formatting
+        run: npm run format:check
+
+      - name: Check unused files, exports, and dependencies
+        run: npm run knip
+
       - name: Check TypeScript and GraphQL
         run: npm run typecheck
 

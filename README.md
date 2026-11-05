@@ -6,7 +6,7 @@ This portfolio project explores a complete shopping flow: collection browsing, p
 
 ## Preview
 
-<!-- Add a repository screenshot and live demo URL before sharing. -->
+![Atelier Uomo editorial storefront — desktop homepage](docs/screenshots/home-desktop.jpg)
 
 ## Stack
 

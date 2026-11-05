@@ -53,9 +53,32 @@ test("customer can update, persist and remove a cart item", async ({ page }) => 
   await expect(drawer.getByRole("textbox", { name: "Quantity", exact: true }))
     .toHaveValue("1");
 
-  await drawer
-    .getByRole("button", { name: /^Increase quantity for / })
-    .click();
+  const [updateResponse] = await Promise.all([
+    page.waitForResponse(
+      (response) =>
+        new URL(response.url()).pathname === "/api/cart" &&
+        response.request().method() === "POST",
+    ),
+    drawer
+      .getByRole("button", { name: /^Increase quantity for / })
+      .click(),
+  ]);
+
+  expect(updateResponse.ok()).toBeTruthy();
+
+  // Confirm the saved server state, not just the optimistic UI.
+  await expect
+    .poll(async () => {
+      const response = await page.request.get("/api/cart");
+      expect(response.ok()).toBeTruthy();
+
+      const data = await response.json();
+      return data.cart?.totalQuantity;
+    }, {
+      message: "Server should persist two cart items",
+      timeout: 10_000,
+    })
+    .toBe(2);
 
   await expect(drawer.getByRole("textbox", { name: "Quantity", exact: true }))
     .toHaveValue("2");
@@ -82,9 +105,29 @@ test("customer can update, persist and remove a cart item", async ({ page }) => 
 
   await expect(checkout).toHaveAttribute("href", /[?&]cartId=/);
 
-  await drawer
-    .getByRole("button", { name: /^Remove / })
-    .click();
+  const [removeResponse] = await Promise.all([
+    page.waitForResponse(
+      (response) =>
+        new URL(response.url()).pathname === "/api/cart" &&
+        response.request().method() === "POST",
+    ),
+    drawer.getByRole("button", { name: /^Remove / }).click(),
+  ]);
+
+  expect(removeResponse.ok()).toBeTruthy();
+
+  await expect
+    .poll(async () => {
+      const response = await page.request.get("/api/cart");
+      expect(response.ok()).toBeTruthy();
+
+      const data = await response.json();
+      return data.cart?.totalQuantity;
+    }, {
+      message: "Server should persist an empty cart",
+      timeout: 10_000,
+    })
+    .toBe(0);
 
   await expect(
     drawer.getByText("Your cart is empty.", { exact: true }),

@@ -1,66 +1,142 @@
 # Atelier Uomo
 
-A menswear storefront portfolio project built with React, TypeScript, React Router SSR, Shopify Hydrogen 2026.10, and Tailwind CSS 4.
+An editorial menswear storefront built with React, TypeScript, Shopify Hydrogen, and React Router SSR.
 
-The catalog, availability, prices, collections, search, and cart use the public mock.shop Storefront API. Product data is demonstrative; checkout does not take real payments or create real orders. Customer Account login requires a real Shopify store and is unavailable with mock.shop.
+This portfolio project explores a complete shopping flow: collection browsing, product variants, search, cart management, and a demonstration checkout.
 
-## Local development
+## Preview
 
-Use Node.js 24 (`nvm use` reads `.nvmrc`) and npm.
+<!-- Add a repository screenshot and live demo URL before sharing. -->
+
+## Stack
+
+- React 19 and TypeScript
+- React Router 7 with server-side rendering
+- Shopify Hydrogen 2026.10
+- Shopify Storefront API and GraphQL
+- Tailwind CSS 4
+- Playwright and Node.js test runner
+- GitHub Actions
+
+## Features
+
+- Responsive editorial homepage and shared visual identity
+- Collection browsing and product search
+- Product details with variant selection
+- Cart drawer and full cart page
+- Quantity updates, removal, and cart persistence
+- Mock checkout handoff that preserves the cart ID
+- Mobile navigation and accessible dialog controls
+
+## Run locally
+
+Use Node.js 24 and npm.
 
 ```bash
+nvm use
 npm ci
 npm run dev
 ```
 
-Open the address printed by Vite. The default mock.shop catalog requires no account, token, or `.env` file. Optional configuration is documented in `.env.example`. Never commit real credentials; `.env` and its local variants are ignored.
+Open the URL printed by Vite.
+
+The default catalog uses mock.shop and requires no Shopify account or API token. Optional environment variables are documented in `.env.example`. Never commit credentials.
 
 ## Checks
 
 ```bash
 npm run typecheck
+node --experimental-strip-types tests/checkout.test.ts
 npm run build
-npm run preview
 ```
 
-Typecheck runs React Router type generation, TypeScript, and Hydrogen GraphQL validation. Preview builds and serves the production bundle locally. There is no automated browser test suite yet; a passing build does not prove cart interactions.
+Typecheck includes React Router type generation, TypeScript, and Hydrogen GraphQL validation.
 
-## Code map
+## Browser tests
 
-- `app/root.tsx`: request middleware, shared layout, cart initialization, and storefront identity.
-- `app/routes/`: server loaders and page components for home, products, collections, search, cart, and account.
-- `app/components/`: shared UI, product cards, dialogs, header, footer, and editorial hero.
-- `app/lib/storefront.ts`: request-scoped Storefront API client.
-- `app/lib/shop.ts`: demo/real-store detection and Shopify runtime configuration.
-- `app/lib/cart*.ts`: cart state, handlers, and drawer helpers.
-- `app/lib/home-hero.ts`: picks an actual API collection and its image for the hero.
-- `app/tokens.css`: shared colors, type, spacing, and UI tokens.
-- `app/app.css`: application styling and responsive Atelier Uomo hero.
-- `server.ts`: Oxygen Worker entry point.
-- `vite.config.ts`: Vite, Tailwind, React Router, and MiniOxygen integration.
+Install Chromium once:
 
-Atelier Uomo owns the displayed brand identity. Product titles, prices, availability, images, and collection links continue to come from Shopify data. The default demo catalog contains multiple categories, including women's clothing; it is not yet a curated menswear catalog. Currency follows the API rather than being relabeled as PLN or EUR.
+```bash
+npx playwright install chromium
+```
 
-## Development stages
+Run the tests:
 
-1. Establish the starter, Git baseline, and TypeScript/GraphQL checks.
-2. Introduce Atelier Uomo identity and a responsive homepage.
-3. Curate an appropriate demo menswear catalog and collection navigation.
-4. Verify product variants, add-to-cart, quantity updates, removal, and persistence in the browser.
-5. Improve collection/search browsing, empty states, and mobile accessibility.
-6. Add focused Playwright coverage for the core shopping flow and prepare metadata/social previews.
-7. Review dependency advisories, publish the GitHub repository, and deploy a verified demo.
+```bash
+npm run test:e2e
+```
 
-## Security and deployment
+Interactive mode and HTML report:
 
-Run `npm audit` to inspect the current dependency tree. Do not use `npm audit fix --force` indiscriminately: npm may propose a breaking MiniOxygen downgrade. Review runtime and development dependencies separately with `npm audit --omit=dev`.
+```bash
+npm run test:e2e:ui
+npm run test:e2e:report
+```
 
-The current React Router dependency emits an `envFile` deprecation warning during development and checks. Updating the React Router 7 packages to 7.18.5 was attempted but npm reported a peer dependency resolution conflict; no dependency or lockfile changes were retained. The original 13 audit findings remain unresolved.
+The four browser scenarios cover:
 
-The starter includes a MiniOxygen compatibility-date workaround in `vite.config.ts`. Reassess it when updating the runtime. Do not deploy publicly before reviewing unresolved advisories and checking the production preview.
+1. Homepage → collection → product navigation.
+2. Cart quantity updates, persistence after reload, removal, and checkout URL.
+3. Search results → product navigation.
+4. Mobile menu → collections navigation.
 
-A real Shopify store can be connected later with Shopify CLI. Customer Accounts additionally require HTTPS and the environment variables described in `.env.example`. Nothing is deployed or linked automatically by these local changes.
+Cart tests verify server state as well as the optimistic interface.
 
-## Attribution
+These are integration tests against live mock.shop data. They require network access and may be affected by catalog changes or service availability. Each test uses an isolated browser context. Failed runs retain traces and screenshots for diagnosis.
 
-Based on Shopify's Hydrogen React Router template. MIT license; see `LICENSE`.
+Four unit tests cover the mock checkout URL helper, including query parameter preservation and unchanged behavior for real Shopify checkout domains.
+
+## Continuous integration
+
+The GitHub Actions workflow is configured to run:
+
+- Dependency installation with `npm ci`
+- TypeScript and GraphQL checks
+- Checkout unit tests
+- Production build
+- Chromium browser tests
+- Test report upload
+
+Its first GitHub run must pass before CI is considered verified.
+
+## Project structure
+
+- `app/routes/` — page components, server loaders, and route metadata
+- `app/components/` — shared interface components
+- `app/lib/` — Storefront API integration, cart helpers, and configuration
+- `app/tokens.css` — shared design tokens
+- `app/app.css` — application and editorial styles
+- `public/fonts/` — locally hosted fonts and their licenses
+- `public/images/` — campaign image and generation prompt
+- `tests/checkout.test.ts` — checkout helper unit tests
+- `tests/e2e/` — Playwright integration tests
+- `server.ts` — Oxygen Worker entry point
+- `.github/workflows/ci.yml` — automated checks
+
+## Design and attribution
+
+The interface follows an Italian fashion editorial direction: expressive typography, an asymmetric campaign layout, restrained colors, and a quieter product presentation.
+
+The campaign image was generated with AI for this fictional brand concept. It does not depict a purchasable catalog item. Product data and product images come from mock.shop.
+
+Fonts are hosted locally, with license files included in `public/fonts/`.
+
+The application is based on Shopify’s Hydrogen React Router template. Custom work includes the Atelier Uomo visual identity, editorial interface, mock checkout cart handoff, and test coverage.
+
+## Demo limitations
+
+- The catalog and inventory are fictional.
+- Checkout takes no real payment and creates no real order.
+- Customer Account login requires a real Shopify store.
+- The sample catalog is not yet fully curated for a menswear brand.
+- Prices and currency follow API data.
+- An intermittent empty-cart result was observed during testing; failure traces are retained to support further diagnosis.
+- Development dependencies and runtime compatibility require continued review before production use.
+
+## Known warnings
+
+The current toolchain emits an `envFile` deprecation warning and React Router v8 future-flag notices. These do not currently prevent typechecking, builds, or the tested shopping flows.
+
+## License
+
+MIT. See `LICENSE`.

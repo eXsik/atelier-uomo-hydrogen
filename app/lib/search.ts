@@ -1,12 +1,16 @@
-import { gql, parseCollectionParams, type StorefrontApi } from "@shopify/hydrogen";
+import {
+  gql,
+  parseCollectionParams,
+  type StorefrontApi,
+} from "@shopify/hydrogen";
 import type { StorefrontClient } from "@shopify/hydrogen";
 import type { ProductFilter as StorefrontApiProductFilter } from "@shopify/hydrogen/storefront-api-types";
 
 import { PRODUCT_CARD_FRAGMENT } from "~/components/ProductCard";
 
-export const SEARCH_PAGE_SIZE = 9;
+const SEARCH_PAGE_SIZE = 9;
 
-export const SEARCH_QUERY = gql(
+const SEARCH_QUERY = gql(
   `
     query SearchPage(
       $term: String!
@@ -74,7 +78,8 @@ type SearchNode = SearchQueryResult["search"]["nodes"][number];
 type SearchProductNode = Extract<SearchNode, { __typename: "Product" }>;
 type SearchFilters = SearchQueryResult["search"]["productFilters"];
 type SearchPageInfo = SearchQueryResult["search"]["pageInfo"];
-type SearchCurrencyCode = SearchQueryResult["shop"]["paymentSettings"]["currencyCode"];
+type SearchCurrencyCode =
+  SearchQueryResult["shop"]["paymentSettings"]["currencyCode"];
 
 type SearchPageEmptyData = {
   performed: false;
@@ -135,7 +140,9 @@ export async function loadSearchPage({
     first: SEARCH_PAGE_SIZE,
     after,
     productFilters:
-      browse.filters.length > 0 ? (browse.filters as StorefrontApiProductFilter[]) : undefined,
+      browse.filters.length > 0
+        ? (browse.filters as StorefrontApiProductFilter[])
+        : undefined,
     sortKey,
     reverse: sortKey === "PRICE" ? browse.reverse || undefined : undefined,
   };

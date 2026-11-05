@@ -1,7 +1,7 @@
 import { gql, type StorefrontApi } from "@shopify/hydrogen";
 import { Link } from "react-router";
 
-export const COLLECTION_CARD_PRODUCT_COUNT_LIMIT = 100;
+const COLLECTION_CARD_PRODUCT_COUNT_LIMIT = 100;
 
 export const COLLECTION_CARD_FRAGMENT = gql(`
   fragment CollectionCard on Collection {
@@ -48,7 +48,10 @@ export type CollectionCardProps = {
   useProductImageFallback?: boolean;
 };
 
-function productCountText(collection: CollectionCardData, productCount?: number) {
+function productCountText(
+  collection: CollectionCardData,
+  productCount?: number,
+) {
   if (typeof productCount === "number") {
     return `${productCount} ${productCount === 1 ? "product" : "products"}`;
   }
@@ -77,11 +80,11 @@ export function CollectionCard({
   return (
     <Link
       to={`/collections/${collection.handle}`}
-      className="card group rounded-card focus-visible:outline-accent relative block overflow-hidden no-underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+      className="card group relative block overflow-hidden rounded-card no-underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
       aria-label={collection.title}
       data-testid="collection-card"
     >
-      <div className="bg-surface-secondary relative block aspect-square overflow-hidden">
+      <div className="relative block aspect-square overflow-hidden bg-surface-secondary">
         {image ? (
           <div className="h-full w-full motion-safe:transition-transform motion-safe:duration-300 motion-safe:group-hover:scale-[1.04]">
             <img
@@ -97,7 +100,7 @@ export function CollectionCard({
         ) : null}
       </div>
       <div className="overlay-dark pointer-events-none absolute inset-0" />
-      <div className="text-interactive-text absolute inset-x-0 bottom-0 z-10 p-4 text-left">
+      <div className="absolute inset-x-0 bottom-0 z-10 p-4 text-left text-interactive-text">
         <h3 className="type-body-lg font-medium">{collection.title}</h3>
         <p className="type-body-sm mt-0.5 opacity-80">
           {productCountText(collection, productCount)}

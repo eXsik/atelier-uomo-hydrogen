@@ -5,10 +5,13 @@
   "scripts": {
     "build": "react-router build",
     "deploy": "shopify hydrogen deploy --assets-dir dist/client --worker-dir dist/server",
-    "dev": "hydrogen skills check --mode=warn && vite dev",
-    "dev:https": "hydrogen skills check --mode=warn && vite dev",
+    "dev": "vite dev",
+    "dev:https": "vite dev",
     "preview": "react-router build && vite preview",
     "typecheck": "react-router typegen && tsc && hydrogen gql check --fail-on-warn",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "knip": "react-router typegen && knip",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:report": "playwright show-report"
@@ -34,6 +37,9 @@
     "@types/react-dom": "^19.2.3",
     "gql.tada": "^1.9.2",
     "graphql": "^16.13.2",
+    "knip": "^6.44.1",
+    "prettier": "^3.9.10",
+    "prettier-plugin-tailwindcss": "^0.8.1",
     "tailwindcss": "^4.2.2",
     "typescript": "^5.9.3",
     "vite": "^8.0.3"

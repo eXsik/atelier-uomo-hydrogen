@@ -36,7 +36,12 @@ export interface CartMutationWarning {
   message: string;
   target?: string;
 }
-declare const CART_UPDATE_CONTEXTS: readonly ["product", "cart", "dialog", "standard-action"];
+declare const CART_UPDATE_CONTEXTS: readonly [
+  "product",
+  "cart",
+  "dialog",
+  "standard-action",
+];
 export type CartUpdateContext = (typeof CART_UPDATE_CONTEXTS)[number];
 declare const CART_UPDATE_ACTIONS: readonly ["add", "remove", "update"];
 export type CartUpdateAction = (typeof CART_UPDATE_ACTIONS)[number];
@@ -46,8 +51,16 @@ export type ActionArgs<P, O = void> = [P] extends [void]
     ? [payload: P, options?: O]
     : [payload?: Exclude<P, void>, options?: O];
 export type DefaultActionHandler<R> = () => Promise<R>;
-export type ActionConfiguration<P, R, Meta extends object = {}, O = void> = Meta & {
-  handler?: (defaultHandler: DefaultActionHandler<R>, ...args: ActionArgs<P, O>) => Promise<R>;
+export type ActionConfiguration<
+  P,
+  R,
+  Meta extends object = {},
+  O = void,
+> = Meta & {
+  handler?: (
+    defaultHandler: DefaultActionHandler<R>,
+    ...args: ActionArgs<P, O>
+  ) => Promise<R>;
 };
 export interface ActionFunction<P, R, Meta extends object = {}, O = void> {
   (...args: ActionArgs<P, O>): Promise<R>;

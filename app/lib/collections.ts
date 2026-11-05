@@ -3,9 +3,9 @@ import type { StorefrontClient } from "@shopify/hydrogen";
 
 import { COLLECTION_CARD_FRAGMENT } from "~/components/CollectionCard";
 
-export const COLLECTIONS_PAGE_SIZE = 12;
+const COLLECTIONS_PAGE_SIZE = 12;
 
-export const COLLECTIONS_QUERY = gql(
+const COLLECTIONS_QUERY = gql(
   `
     query CollectionsList($first: Int!, $after: String) {
       collections(first: $first, after: $after) {
@@ -22,7 +22,9 @@ export const COLLECTIONS_QUERY = gql(
   [COLLECTION_CARD_FRAGMENT],
 );
 
-type CollectionsQueryVariables = StorefrontApi.VariablesOf<typeof COLLECTIONS_QUERY>;
+type CollectionsQueryVariables = StorefrontApi.VariablesOf<
+  typeof COLLECTIONS_QUERY
+>;
 
 export async function loadCollectionsPage({
   storefrontClient,
@@ -37,7 +39,9 @@ export async function loadCollectionsPage({
     after: url.searchParams.get("after") || null,
   };
 
-  const { data } = await storefrontClient.graphql(COLLECTIONS_QUERY, { variables });
+  const { data } = await storefrontClient.graphql(COLLECTIONS_QUERY, {
+    variables,
+  });
 
   return {
     collections: data?.collections ?? {

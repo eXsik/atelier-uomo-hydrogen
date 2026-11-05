@@ -20,7 +20,8 @@ import {
 
 // Real store: private token + trusted buyer IP. mock.shop: tokenless public
 // access (it is auth-free and rejects any private token, even a placeholder).
-export type RequestStorefrontClient = RequestScopedPrivateStorefrontClient | PublicStorefrontClient;
+export type RequestStorefrontClient =
+  RequestScopedPrivateStorefrontClient | PublicStorefrontClient;
 
 export function createRequestStorefrontClient(
   request: Request,

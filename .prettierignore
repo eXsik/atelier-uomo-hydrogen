@@ -1,0 +1,10 @@
+node_modules/
+dist/
+build/
+.react-router/
+.agents/
+public/
+docs/screenshots/
+playwright-report/
+test-results/
+package-lock.json

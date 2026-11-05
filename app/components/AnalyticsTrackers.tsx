@@ -27,7 +27,12 @@ function toAnalyticsCart(cart: CartData): AnalyticsCart | null {
         const merchandise = line.merchandise;
         const product = merchandise?.product;
         // Optimistic lines may not have product details yet.
-        if (!merchandise?.id || !product?.id || !product.title || !product.vendor) {
+        if (
+          !merchandise?.id ||
+          !product?.id ||
+          !product.title ||
+          !product.vendor
+        ) {
           return [];
         }
         return [

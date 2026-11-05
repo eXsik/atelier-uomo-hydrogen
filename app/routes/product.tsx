@@ -1,21 +1,30 @@
 import {
   AnalyticsEvent,
-  buildProductSelectionSearchParams,
   canAddToCart,
   getSelectedProductOptions,
   gql,
-  type SelectedOption,
 } from "@shopify/hydrogen";
 import { ShopPayButton } from "@shopify/hydrogen/react";
-import { useEffect, useMemo, useState, type MouseEvent } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
 
 import { ProductCard, PRODUCT_CARD_FRAGMENT } from "~/components/ProductCard";
+import { ProductGallery } from "~/components/product/ProductGallery";
+import { ProductVariantOptions } from "~/components/product/ProductVariantOptions";
 import { openCartDrawer } from "~/lib/cart-drawer";
 import { formatPrice, salePercent } from "~/lib/money";
-import { ProductProvider, useProductForm } from "~/lib/product";
+import {
+  ProductProvider,
+  useProductForm,
+  type ProductData,
+  type ProductVariantData,
+  variantUrl,
+} from "~/lib/product";
 import { storefrontClientContext } from "~/lib/storefront";
-import { formatPageTitle, getShopNameFromRootMatch } from "~/lib/storefront-shop";
+import {
+  formatPageTitle,
+  getShopNameFromRootMatch,
+} from "~/lib/storefront-shop";
 
 import type { Route } from "./+types/product";
 
@@ -133,13 +142,17 @@ const PRODUCT_QUERY = gql(
   [PRODUCT_VARIANT_FRAGMENT, PRODUCT_CARD_FRAGMENT],
 );
 
-export function meta({ matches }: Route.MetaArgs) {
+export function meta({ data, matches }: Route.MetaArgs) {
   const shopName = getShopNameFromRootMatch(matches[0]);
+  const product = data?.product;
+
   return [
-    { title: formatPageTitle("Product", shopName) },
+    { title: formatPageTitle(product?.title ?? "Product", shopName) },
     {
       name: "description",
-      content: `Shop the ${shopName} product detail page.`,
+      content:
+        product?.description.trim() ||
+        `Discover the collection at ${shopName}.`,
     },
   ];
 }
@@ -166,64 +179,8 @@ export async function loader({ context, params, request }: Route.LoaderArgs) {
   };
 }
 
-type ProductData = Route.ComponentProps["loaderData"]["product"];
-type ProductVariant = NonNullable<ProductData["selectedOrFirstAvailableVariant"]>;
-type RelatedProduct = Route.ComponentProps["loaderData"]["relatedProducts"][number];
-
-type ProductImage = {
-  id?: string | null;
-  url: string;
-  altText?: string | null;
-  width?: number | null;
-  height?: number | null;
-};
-
-type SwatchValue = {
-  color?: string | null;
-  imageUrl?: string | null;
-};
-
-function toRouterLocation(url: string) {
-  return url;
-}
-
-function variantUrl(
-  product: { handle: string; options: Array<{ name: string }> },
-  selectedOptions: SelectedOption[],
-  handle = product.handle,
-  base: URLSearchParams = new URLSearchParams(),
-) {
-  const params = buildProductSelectionSearchParams({
-    selectedOptions,
-    optionNames: product.options.map((option) => option.name),
-    base,
-  });
-  const query = params.toString();
-  return `/products/${handle}${query ? `?${query}` : ""}`;
-}
-
-function buildSwatchLookup(product: ProductData) {
-  const lookup = new Map<string, SwatchValue>();
-  for (const option of product.options) {
-    for (const value of option.optionValues) {
-      const swatch = value.swatch;
-      lookup.set(`${option.name}:${value.name}`, {
-        color: swatch?.color ?? null,
-        imageUrl: swatch?.image?.previewImage?.url ?? null,
-      });
-    }
-  }
-  return lookup;
-}
-
-function hasSwatchData(product: ProductData, optionName: string) {
-  const option = product.options.find((candidate) => candidate.name === optionName);
-  return Boolean(
-    option?.optionValues.some(
-      (value) => value.swatch?.color || value.swatch?.image?.previewImage?.url,
-    ),
-  );
-}
+type RelatedProduct =
+  Route.ComponentProps["loaderData"]["relatedProducts"][number];
 
 function ProductViewedTracker({ product }: { product: ProductData }) {
   useEffect(() => {
@@ -247,108 +204,12 @@ function ProductViewedTracker({ product }: { product: ProductData }) {
   return null;
 }
 
-function useGalleryImages(product: ProductData, selectedVariant: ProductVariant | null) {
-  return useMemo(() => {
-    const images: ProductImage[] = [];
-    const seen = new Set<string>();
-    const addImage = (image: ProductImage | null | undefined) => {
-      if (!image?.url || seen.has(image.url)) return;
-      seen.add(image.url);
-      images.push(image);
-    };
-
-    addImage(selectedVariant?.image ?? product.featuredImage ?? product.images.nodes[0]);
-    for (const image of product.images.nodes) addImage(image);
-    return images;
-  }, [product, selectedVariant]);
-}
-
-function galleryDotClass(active: boolean) {
-  if (active) return "bg-on-surface size-2 rounded-full";
-  return "bg-on-surface/30 size-2 rounded-full";
-}
-
-function ProductGallery({
-  product,
-  selectedVariant,
-}: {
-  product: ProductData;
-  selectedVariant: ProductVariant | null;
-}) {
-  const images = useGalleryImages(product, selectedVariant);
-  const primaryImageUrl = images[0]?.url;
-  const [activeIndex, setActiveIndex] = useState(0);
-
-  useEffect(() => setActiveIndex(0), [primaryImageUrl]);
-
-  return (
-    <div data-testid="product-gallery">
-      <div
-        role="region"
-        aria-roledescription="carousel"
-        aria-label={product.title}
-        className="relative grid"
-      >
-        <div
-          data-product-gallery-track
-          className="flex snap-x snap-mandatory overflow-x-auto md:grid md:grid-cols-2 md:overflow-visible"
-          style={{ scrollbarWidth: "none" }}
-          tabIndex={0}
-          onScroll={(event) => {
-            const track = event.currentTarget;
-            if (track.clientWidth > 0) {
-              setActiveIndex(Math.round(track.scrollLeft / track.clientWidth));
-            }
-          }}
-        >
-          {images.map((image, index) => (
-            <div
-              key={image.url}
-              role="group"
-              aria-roledescription="slide"
-              aria-label={`Slide ${index + 1} of ${images.length}`}
-              className="w-full shrink-0 snap-center contain-paint md:w-auto md:shrink"
-            >
-              <div className="bg-surface-secondary aspect-square overflow-hidden">
-                <img
-                  src={image.url}
-                  alt={image.altText ?? product.title}
-                  width={image.width ?? undefined}
-                  height={image.height ?? undefined}
-                  className="h-full w-full object-cover"
-                  loading={index === 0 ? "eager" : "lazy"}
-                  fetchPriority={index === 0 ? "high" : "auto"}
-                  data-testid={index === 0 ? "product-gallery-image" : undefined}
-                />
-              </div>
-            </div>
-          ))}
-        </div>
-        {images.length > 1 ? (
-          <div className="absolute inset-x-0 bottom-4 z-10 flex items-center justify-center gap-3 md:hidden">
-            <div
-              data-slideshow-dots
-              role="group"
-              aria-label="Slideshow pagination"
-              className="flex items-center justify-center gap-2"
-            >
-              {images.map((image, index) => (
-                <span key={image.url} className={galleryDotClass(index === activeIndex)} />
-              ))}
-            </div>
-          </div>
-        ) : null}
-      </div>
-    </div>
-  );
-}
-
 function PriceBlock({
   product,
   selectedVariant,
 }: {
   product: ProductData;
-  selectedVariant: ProductVariant | null;
+  selectedVariant: ProductVariantData | null;
 }) {
   const price = selectedVariant?.price ?? product.priceRange.minVariantPrice;
   const compareAt = selectedVariant?.compareAtPrice;
@@ -359,20 +220,23 @@ function PriceBlock({
       <div className="inline-flex flex-wrap items-baseline gap-2">
         {compareAt && percent ? (
           <>
-            <span className="text-sale font-medium">
+            <span className="font-medium text-sale">
               <span className="sr-only">Sale price: </span>
               {formatPrice(price)}
             </span>
-            <s className="text-compare text-sm">
+            <s className="text-sm text-compare">
               <span className="sr-only">Regular price: </span>
               {formatPrice(compareAt)}
             </s>
-            <span className="text-sale text-sm font-medium" aria-label={`Save ${percent}%`}>
+            <span
+              className="text-sm font-medium text-sale"
+              aria-label={`Save ${percent}%`}
+            >
               (-{percent}%)
             </span>
           </>
         ) : (
-          <span className="text-on-surface font-medium">
+          <span className="font-medium text-on-surface">
             <span className="sr-only">Price: </span>
             {formatPrice(price)}
           </span>
@@ -382,17 +246,21 @@ function PriceBlock({
   );
 }
 
-function InventoryHint({ selectedVariant }: { selectedVariant: ProductVariant | null }) {
+function InventoryHint({
+  selectedVariant,
+}: {
+  selectedVariant: ProductVariantData | null;
+}) {
   if (!selectedVariant) return null;
   if (!selectedVariant.availableForSale) {
     return (
       <div className="mt-3">
         <div className="flex items-center gap-2 text-sm" data-product-inventory>
           <span
-            className="bg-critical inline-block h-2 w-2 shrink-0 rounded-full"
+            className="inline-block h-2 w-2 shrink-0 rounded-full bg-critical"
             aria-hidden="true"
           />
-          <span className="text-critical font-medium">Out of stock</span>
+          <span className="font-medium text-critical">Out of stock</span>
         </div>
       </div>
     );
@@ -405,154 +273,13 @@ function InventoryHint({ selectedVariant }: { selectedVariant: ProductVariant | 
     <div className="mt-3">
       <div className="flex items-center gap-2 text-sm" data-product-inventory>
         <span
-          className="bg-warning inline-block h-2 w-2 shrink-0 rounded-full"
+          className="inline-block h-2 w-2 shrink-0 rounded-full bg-warning"
           aria-hidden="true"
         />
-        <span className="text-warning font-medium">Only {quantity} left in stock</span>
+        <span className="font-medium text-warning">
+          Only {quantity} left in stock
+        </span>
       </div>
-    </div>
-  );
-}
-
-// Mirrors React Router's own Link guard: a modified or non-primary click belongs to
-// the browser (new tab, new window), so the href must stay in charge of it.
-function isPlainActivation(event: MouseEvent<HTMLAnchorElement>) {
-  return (
-    !event.defaultPrevented &&
-    event.button === 0 &&
-    !event.metaKey &&
-    !event.altKey &&
-    !event.ctrlKey &&
-    !event.shiftKey &&
-    (!event.currentTarget.target || event.currentTarget.target === "_self")
-  );
-}
-
-function VariantOptions({ product }: { product: ProductData }) {
-  const { options, register } = useProductForm();
-  const swatches = useMemo(() => buildSwatchLookup(product), [product]);
-  const location = useLocation();
-  const baseParams = useMemo(() => new URLSearchParams(location.search), [location.search]);
-
-  return (
-    <div className="swatch-buttons space-y-4">
-      {options.map((option) => {
-        const selectedValue = option.values.find((value) => value.selected)?.name;
-        const renderSwatches = hasSwatchData(product, option.name);
-        const isColorOption = option.name.toLowerCase().includes("color");
-
-        return (
-          <fieldset key={option.name} className="space-y-2">
-            <legend className="text-on-surface text-sm font-medium">
-              {option.name}
-              {selectedValue ? `: ${selectedValue}` : ""}
-            </legend>
-            <div className="flex flex-wrap gap-2" role="group" aria-label={option.name}>
-              {option.values.map((variantOption) => {
-                const valueName = variantOption.name;
-                const registered = register("optionValue", {
-                  optionName: option.name,
-                  value: valueName,
-                });
-                const isCrossProduct = variantOption.handle !== product.handle;
-                const linkTarget = variantUrl(
-                  product,
-                  variantOption.selectedOptions,
-                  variantOption.handle,
-                  baseParams,
-                );
-                const soldOut = !variantOption.available;
-                const testId = isColorOption ? "color-swatch" : undefined;
-                const swatch = renderSwatches ? swatches.get(`${option.name}:${valueName}`) : null;
-                const swatchStyle = swatch?.imageUrl
-                  ? { backgroundImage: `url("${swatch.imageUrl}")` }
-                  : { backgroundColor: swatch?.color ?? undefined };
-
-                const className = renderSwatches
-                  ? `min-h-touch-target min-w-touch-target relative inline-flex cursor-pointer items-center justify-center motion-safe:transition-transform motion-safe:active:scale-[0.93] ${soldOut ? "opacity-50" : ""}`
-                  : `option-pill focus-visible:outline-accent motion-safe:transition-[color,background-color,border-color,transform] motion-safe:active:scale-[0.97] ${variantOption.selected ? "is-selected" : ""} ${soldOut ? "opacity-50" : ""}`;
-                const content = renderSwatches ? (
-                  <>
-                    <span
-                      className={`swatch-md border-border relative inline-flex items-center justify-center overflow-hidden rounded-full border-2 ring-offset-2 ${variantOption.selected ? "border-interactive" : ""}`}
-                      style={swatchStyle}
-                    >
-                      {variantOption.selected ? (
-                        <span className="swatch-scrim absolute inset-0" />
-                      ) : null}
-                      {soldOut ? (
-                        <svg
-                          className="absolute inset-0 h-full w-full"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="1.5"
-                          aria-hidden="true"
-                        >
-                          <line x1="4" y1="4" x2="20" y2="20" />
-                        </svg>
-                      ) : null}
-                    </span>
-                    <span className="sr-only">
-                      {valueName}
-                      {soldOut ? " (Sold out)" : ""}
-                    </span>
-                  </>
-                ) : (
-                  `${valueName}${soldOut ? " (Sold out)" : ""}`
-                );
-
-                if (!isCrossProduct && !variantOption.exists) {
-                  return (
-                    <button
-                      key={valueName}
-                      type="button"
-                      disabled
-                      className={className}
-                      aria-label={renderSwatches ? valueName : undefined}
-                      aria-pressed={variantOption.selected}
-                      data-testid={testId}
-                    >
-                      {content}
-                    </button>
-                  );
-                }
-
-                // Every selectable value is an <a> whichever product it belongs to. The
-                // activated value flips from cross-product to same-product after the
-                // navigation, and a change of element type there would remount the
-                // focused control and drop focus to <body>.
-                return (
-                  <Link
-                    key={valueName}
-                    to={toRouterLocation(linkTarget)}
-                    replace={!isCrossProduct}
-                    preventScrollReset
-                    className={className}
-                    aria-label={renderSwatches ? valueName : undefined}
-                    aria-current={variantOption.selected ? "true" : undefined}
-                    data-testid={testId}
-                    onClick={
-                      isCrossProduct
-                        ? undefined
-                        : (event) => {
-                            if (!isPlainActivation(event)) return;
-                            registered.onClick();
-                            // onSelect has already navigated with the provider's replace
-                            // and revalidation settings. Letting Link navigate too would
-                            // refetch the loader that a resolved selection just skipped.
-                            event.preventDefault();
-                          }
-                    }
-                  >
-                    {content}
-                  </Link>
-                );
-              })}
-            </div>
-          </fieldset>
-        );
-      })}
     </div>
   );
 }
@@ -569,21 +296,29 @@ function QuantitySelector({
 
   return (
     <div className="shrink-0">
-      <label className="text-on-surface mb-2 block text-sm font-medium" htmlFor="quantity">
+      <label
+        className="mb-2 block text-sm font-medium text-on-surface"
+        htmlFor="quantity"
+      >
         Quantity
       </label>
       <div
-        className="quantity-selector-outlined rounded-input inline-flex items-center"
+        className="quantity-selector-outlined inline-flex items-center rounded-input"
         data-testid="quantity-stepper"
       >
         <button
           type="button"
-          className="text-on-surface-secondary hover:text-on-surface inline-flex size-11 items-center justify-center disabled:cursor-not-allowed disabled:opacity-50 motion-safe:transition-[color,transform] motion-safe:active:scale-[0.90]"
+          className="inline-flex size-11 items-center justify-center text-on-surface-secondary hover:text-on-surface disabled:cursor-not-allowed disabled:opacity-50 motion-safe:transition-[color,transform] motion-safe:active:scale-[0.90]"
           aria-label="Decrease quantity"
           onClick={() => setQuantity(clamp(quantity - 1))}
           disabled={quantity <= 1}
         >
-          <img src="/icons/icon-minus.svg" alt="" className="size-4" aria-hidden="true" />
+          <img
+            src="/icons/icon-minus.svg"
+            alt=""
+            className="size-4"
+            aria-hidden="true"
+          />
         </button>
         <input
           type="number"
@@ -592,20 +327,27 @@ function QuantitySelector({
           min={1}
           max={99}
           step={1}
-          className="number-reset text-on-surface h-11 w-12 rounded-none border-0 bg-transparent p-0 text-center text-sm"
+          className="number-reset h-11 w-12 rounded-none border-0 bg-transparent p-0 text-center text-sm text-on-surface"
           aria-label="Quantity"
           onChange={(event) =>
-            setQuantity(clamp(Number.parseInt(event.currentTarget.value, 10) || 1))
+            setQuantity(
+              clamp(Number.parseInt(event.currentTarget.value, 10) || 1),
+            )
           }
         />
         <button
           type="button"
-          className="text-on-surface-secondary hover:text-on-surface inline-flex size-11 items-center justify-center disabled:cursor-not-allowed disabled:opacity-50 motion-safe:transition-[color,transform] motion-safe:active:scale-[0.90]"
+          className="inline-flex size-11 items-center justify-center text-on-surface-secondary hover:text-on-surface disabled:cursor-not-allowed disabled:opacity-50 motion-safe:transition-[color,transform] motion-safe:active:scale-[0.90]"
           aria-label="Increase quantity"
           onClick={() => setQuantity(clamp(quantity + 1))}
           disabled={quantity >= 99}
         >
-          <img src="/icons/icon-plus.svg" alt="" className="size-4" aria-hidden="true" />
+          <img
+            src="/icons/icon-plus.svg"
+            alt=""
+            className="size-4"
+            aria-hidden="true"
+          />
         </button>
       </div>
     </div>
@@ -621,11 +363,15 @@ function AddToCart({
   product: ProductData;
   quantity: number;
   setQuantity: (quantity: number) => void;
-  selectedVariant: ProductVariant | null;
+  selectedVariant: ProductVariantData | null;
 }) {
   const { options, register, formProps, errors, pending } = useProductForm();
   const addable = canAddToCart(product, options);
-  const buttonText = addable ? "Add to cart" : selectedVariant ? "Sold out" : "Select options";
+  const buttonText = addable
+    ? "Add to cart"
+    : selectedVariant
+      ? "Sold out"
+      : "Select options";
 
   return (
     <>
@@ -636,7 +382,7 @@ function AddToCart({
         <input type="hidden" {...register("merchandiseId", {})} />
         <button
           {...register("addToCart", {})}
-          className="rounded-button button-primary focus-visible:outline-accent inline-flex h-11 w-full cursor-pointer items-center justify-center gap-2 px-3 text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-50 motion-safe:transition-[color,background-color,border-color,transform] motion-safe:active:scale-[0.97]"
+          className="button-primary inline-flex h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-button px-3 text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-50 motion-safe:transition-[color,background-color,border-color,transform] motion-safe:active:scale-[0.97]"
           disabled={!addable || pending}
           data-testid="add-to-cart"
         >
@@ -653,7 +399,8 @@ function AddToCart({
           />
         </div>
       ) : null}
-      {[...errors.userErrors, ...errors.warnings, ...errors.networkErrors].length ? (
+      {[...errors.userErrors, ...errors.warnings, ...errors.networkErrors]
+        .length ? (
         <div className="mt-3 grid gap-1 text-sm" role="alert">
           {errors.userErrors.map((error) => (
             <p key={error.message} className="text-critical">
@@ -681,7 +428,7 @@ function ProductInfo({
   selectedVariant,
 }: {
   product: ProductData;
-  selectedVariant: ProductVariant | null;
+  selectedVariant: ProductVariantData | null;
 }) {
   const [quantity, setQuantity] = useState(1);
 
@@ -689,7 +436,7 @@ function ProductInfo({
     <div className="flex flex-col gap-6 md:sticky md:top-8 md:self-start">
       <div className="pt-4 md:pt-8">
         {product.vendor ? (
-          <p className="type-body-sm text-on-surface-secondary mb-4 tracking-wide uppercase">
+          <p className="type-body-sm mb-4 tracking-wide text-on-surface-secondary uppercase">
             {product.vendor}
           </p>
         ) : null}
@@ -701,14 +448,14 @@ function ProductInfo({
       <span className="sr-only" aria-live="polite" id="inventory-status" />
 
       {product.description ? (
-        <div className="type-body-sm text-on-surface-secondary leading-relaxed">
+        <div className="type-body-sm leading-relaxed text-on-surface-secondary">
           {product.description}
         </div>
       ) : null}
 
       <div data-product-form>
         <span className="sr-only" aria-live="polite" data-add-to-cart-status />
-        <VariantOptions product={product} />
+        <ProductVariantOptions product={product} />
         <AddToCart
           product={product}
           quantity={quantity}
@@ -718,8 +465,12 @@ function ProductInfo({
       </div>
 
       <h2 className="sr-only">Product details</h2>
-      <details className="group border-border border-t border-b" name="product-details" open>
-        <summary className="marker-hidden text-on-surface hover:text-on-surface-secondary flex cursor-pointer items-center justify-between px-1 py-4 text-sm font-medium">
+      <details
+        className="group border-t border-b border-border"
+        name="product-details"
+        open
+      >
+        <summary className="marker-hidden flex cursor-pointer items-center justify-between px-1 py-4 text-sm font-medium text-on-surface hover:text-on-surface-secondary">
           <span className="text-sm font-medium">Description</span>
           <span
             className="ms-4 size-4 shrink-0 group-open:rotate-180 motion-safe:transition-transform motion-safe:duration-200"
@@ -728,9 +479,11 @@ function ProductInfo({
             <img src="/icons/icon-chevron-down.svg" alt="" className="size-4" />
           </span>
         </summary>
-        <div className="richtext text-on-surface-secondary px-1 pb-4 text-sm">
+        <div className="richtext px-1 pb-4 text-sm text-on-surface-secondary">
           {product.descriptionHtml ? (
-            <div dangerouslySetInnerHTML={{ __html: product.descriptionHtml }} />
+            <div
+              dangerouslySetInnerHTML={{ __html: product.descriptionHtml }}
+            />
           ) : (
             <p>{product.description}</p>
           )}
@@ -744,7 +497,7 @@ function ProductPageContent({ product }: { product: ProductData }) {
   const { selectedVariant } = useProductForm();
 
   return (
-    <section className="max-w-page px-margin mx-auto w-full pb-4">
+    <section className="mx-auto w-full max-w-page px-margin pb-4">
       <div className="product-grid mb-16 grid grid-cols-1 gap-6 md:gap-12">
         <ProductGallery product={product} selectedVariant={selectedVariant} />
         <ProductInfo product={product} selectedVariant={selectedVariant} />
@@ -758,18 +511,15 @@ function RelatedProducts({ products }: { products: RelatedProduct[] }) {
 
   return (
     <section className="py-4" aria-labelledby="related-products-heading">
-      <div className="border-border border-t pt-12">
+      <div className="border-t border-border pt-12">
         <h2
           id="related-products-heading"
-          className="type-heading-xl max-w-page px-margin mx-auto mb-8"
+          className="type-heading-xl mx-auto mb-8 max-w-page px-margin"
         >
           More products
         </h2>
-        <div className="max-w-page px-margin mx-auto contain-paint">
-          <ul
-            role="list"
-            className="related-products-grid"
-          >
+        <div className="mx-auto max-w-page px-margin contain-paint">
+          <ul role="list" className="related-products-grid">
             {products.map((product) => (
               <li key={product.handle}>
                 <ProductCard product={product} />
@@ -791,18 +541,18 @@ export default function ProductRoute({ loaderData }: Route.ComponentProps) {
     <ProductProvider
       product={product}
       onSelect={(result) => {
-        const url = toRouterLocation(
-          variantUrl(
-            product,
-            result.selectedOptions,
-            result.selectedVariant?.product?.handle,
-            new URLSearchParams(location.search),
-          ),
+        const url = variantUrl(
+          product,
+          result.selectedOptions,
+          result.selectedVariant?.product?.handle,
+          new URLSearchParams(location.search),
         );
         void navigate(url, {
           replace: true,
           preventScrollReset: true,
-          ...(result.status === "resolved" ? { defaultShouldRevalidate: false } : {}),
+          ...(result.status === "resolved"
+            ? { defaultShouldRevalidate: false }
+            : {}),
         });
       }}
     >

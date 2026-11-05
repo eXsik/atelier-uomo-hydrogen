@@ -1,8 +1,13 @@
 import { Link } from "react-router";
 
-import { closeMobileNavDrawer, MOBILE_NAV_DRAWER_ID, openDialogFallback } from "~/lib/cart-drawer";
+import {
+  closeMobileNavDrawer,
+  MOBILE_NAV_DRAWER_ID,
+  openDialogFallback,
+} from "~/lib/cart-drawer";
 
 export function MobileNav() {
+  // The browser may open this native dialog before React hydrates.
   return (
     <dialog
       id={MOBILE_NAV_DRAWER_ID}
@@ -10,11 +15,12 @@ export function MobileNav() {
       aria-labelledby="mobile-nav-title"
       data-testid="mobile-nav"
       closedby="any"
+      suppressHydrationWarning
     >
       <div className="flex h-full flex-col">
-        <div className="min-h-touch-target relative flex shrink-0 items-center px-4 py-1">
+        <div className="relative flex min-h-touch-target shrink-0 items-center px-4 py-1">
           <span
-            className="text-on-surface pointer-events-none absolute left-1/2 -translate-x-1/2 text-sm font-medium"
+            className="pointer-events-none absolute left-1/2 -translate-x-1/2 text-sm font-medium text-on-surface"
             id="mobile-nav-title"
             aria-live="polite"
           >
@@ -24,11 +30,16 @@ export function MobileNav() {
             type="button"
             commandfor={MOBILE_NAV_DRAWER_ID}
             command="close"
-            className="button-icon focus-visible:outline-accent ms-auto inline-flex h-11 w-11 cursor-pointer items-center justify-center rounded font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 motion-safe:transition-[color,background-color,border-color,transform] motion-safe:active:scale-[0.97]"
+            className="button-icon ms-auto inline-flex h-11 w-11 cursor-pointer items-center justify-center rounded font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent motion-safe:transition-[color,background-color,border-color,transform] motion-safe:active:scale-[0.97]"
             aria-label="Close"
             onClick={() => closeMobileNavDrawer()}
           >
-            <img src="/icons/icon-x.svg" alt="" className="size-5" aria-hidden="true" />
+            <img
+              src="/icons/icon-x.svg"
+              alt=""
+              className="size-5"
+              aria-hidden="true"
+            />
           </button>
         </div>
         <div className="flex-1 overflow-y-auto p-4">
@@ -37,7 +48,7 @@ export function MobileNav() {
               <li>
                 <Link
                   to="/collections"
-                  className="min-h-touch-target text-on-surface flex items-center rounded-sm text-xl font-normal no-underline hover:opacity-70 motion-safe:transition-opacity"
+                  className="flex min-h-touch-target items-center rounded-sm text-xl font-normal text-on-surface no-underline hover:opacity-70 motion-safe:transition-opacity"
                   onClick={() => closeMobileNavDrawer()}
                 >
                   The collection
@@ -46,7 +57,7 @@ export function MobileNav() {
               <li>
                 <Link
                   to="/#the-edit"
-                  className="min-h-touch-target text-on-surface flex items-center py-3 text-xl"
+                  className="flex min-h-touch-target items-center py-3 text-xl text-on-surface"
                   onClick={() => closeMobileNavDrawer()}
                 >
                   The edit
@@ -66,14 +77,19 @@ export function MobileNavTrigger() {
       type="button"
       commandfor={MOBILE_NAV_DRAWER_ID}
       command="show-modal"
-      className="button-icon focus-visible:outline-accent inline-flex h-11 w-11 cursor-pointer items-center justify-center gap-2 rounded font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 motion-safe:transition-[color,background-color,border-color,transform] motion-safe:active:scale-[0.97]"
+      className="button-icon inline-flex h-11 w-11 cursor-pointer items-center justify-center gap-2 rounded font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent motion-safe:transition-[color,background-color,border-color,transform] motion-safe:active:scale-[0.97]"
       aria-label="Menu"
       aria-controls={MOBILE_NAV_DRAWER_ID}
       aria-haspopup="dialog"
       data-testid="nav-trigger"
       onClick={() => openDialogFallback(MOBILE_NAV_DRAWER_ID)}
     >
-      <img src="/icons/icon-menu.svg" alt="" className="size-5" aria-hidden="true" />
+      <img
+        src="/icons/icon-menu.svg"
+        alt=""
+        className="size-5"
+        aria-hidden="true"
+      />
     </button>
   );
 }

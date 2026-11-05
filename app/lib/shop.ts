@@ -29,7 +29,10 @@ export const storefrontConfig = {
 // a mock.shop host; otherwise the tokenless mock.shop demo. MOCK_SHOP=1 forces
 // mock (used by the gate + as the zero-config default).
 export function shouldUseMockShop(
-  env: Pick<Env, "MOCK_SHOP" | "PRIVATE_STOREFRONT_API_TOKEN" | "PUBLIC_STORE_DOMAIN">,
+  env: Pick<
+    Env,
+    "MOCK_SHOP" | "PRIVATE_STOREFRONT_API_TOKEN" | "PUBLIC_STORE_DOMAIN"
+  >,
 ): boolean {
   return (
     env.MOCK_SHOP === "1" ||
@@ -41,16 +44,23 @@ export function shouldUseMockShop(
 // mock.shop is a catalog of stores, not one store. The default store at mock.shop
 // sells apparel basics; every other store lives on its own host (pets.mock.shop,
 // snowboards.mock.shop, ...) and is listed at https://mock.shop/llms.txt.
-export const MOCK_SHOP_DOMAIN = "mock.shop";
+const MOCK_SHOP_DOMAIN = "mock.shop";
 
-export function isMockShopDomain(domain: string | undefined): domain is string {
-  return domain === MOCK_SHOP_DOMAIN || Boolean(domain?.endsWith(`.${MOCK_SHOP_DOMAIN}`));
+function isMockShopDomain(domain: string | undefined): domain is string {
+  return (
+    domain === MOCK_SHOP_DOMAIN ||
+    Boolean(domain?.endsWith(`.${MOCK_SHOP_DOMAIN}`))
+  );
 }
 
 // Store domain for mock mode: a mock.shop host in PUBLIC_STORE_DOMAIN selects that
 // store's catalog; anything else means the default store.
-export function getMockShopDomain(env: Pick<Env, "PUBLIC_STORE_DOMAIN">): string {
-  return isMockShopDomain(env.PUBLIC_STORE_DOMAIN) ? env.PUBLIC_STORE_DOMAIN : MOCK_SHOP_DOMAIN;
+export function getMockShopDomain(
+  env: Pick<Env, "PUBLIC_STORE_DOMAIN">,
+): string {
+  return isMockShopDomain(env.PUBLIC_STORE_DOMAIN)
+    ? env.PUBLIC_STORE_DOMAIN
+    : MOCK_SHOP_DOMAIN;
 }
 
 // Store domain for real-store mode: prefer the worker env (Oxygen injects
@@ -73,13 +83,20 @@ export type ShopIdentity = {
 export function resolveShopIdentity(
   env: Pick<
     Env,
-    "MOCK_SHOP" | "PRIVATE_STOREFRONT_API_TOKEN" | "PUBLIC_STORE_DOMAIN" | "PUBLIC_STOREFRONT_ID"
+    | "MOCK_SHOP"
+    | "PRIVATE_STOREFRONT_API_TOKEN"
+    | "PUBLIC_STORE_DOMAIN"
+    | "PUBLIC_STOREFRONT_ID"
   >,
   shopId: string,
 ): ShopIdentity {
   if (shouldUseMockShop(env)) {
     return {
-      scriptShop: { shopId, storefrontId: "", myshopifyDomain: getMockShopDomain(env) },
+      scriptShop: {
+        shopId,
+        storefrontId: "",
+        myshopifyDomain: getMockShopDomain(env),
+      },
       analyticsShop: { shopId, channel: "headless" },
       shopifyAnalytics: false,
     };
@@ -105,7 +122,9 @@ export const analyticsConsent = {
 // Private Storefront API token for SSR requests. Read from the worker environment
 // so a standalone clone supplies it via .env / Oxygen bindings. Never commit a
 // real token.
-export function getPrivateStorefrontToken(env: Pick<Env, "PRIVATE_STOREFRONT_API_TOKEN">): string {
+export function getPrivateStorefrontToken(
+  env: Pick<Env, "PRIVATE_STOREFRONT_API_TOKEN">,
+): string {
   const token = env.PRIVATE_STOREFRONT_API_TOKEN;
   if (!token) {
     throw new Error(
@@ -119,8 +138,12 @@ export function getPrivateStorefrontToken(env: Pick<Env, "PRIVATE_STOREFRONT_API
 // Buyer IP for private Storefront clients (Shopify uses it for bot/abuse
 // signals). Returns the first trusted forwarded IP; falls back to localhost in
 // development and throws in production when none is present.
-const BUYER_IP_HEADERS = ["oxygen-buyer-ip", "cf-connecting-ip", "x-forwarded-for"] as const;
-export const DEVELOPMENT_BUYER_IP = "127.0.0.1";
+const BUYER_IP_HEADERS = [
+  "oxygen-buyer-ip",
+  "cf-connecting-ip",
+  "x-forwarded-for",
+] as const;
+const DEVELOPMENT_BUYER_IP = "127.0.0.1";
 
 export function getBuyerIp(headers: Pick<Headers, "get">): string {
   for (const header of BUYER_IP_HEADERS) {
@@ -128,5 +151,7 @@ export function getBuyerIp(headers: Pick<Headers, "get">): string {
     if (ip) return ip;
   }
   if (process.env.NODE_ENV !== "production") return DEVELOPMENT_BUYER_IP;
-  throw new Error(`${BUYER_IP_HEADERS.join(", ")} is required for private Storefront API clients`);
+  throw new Error(
+    `${BUYER_IP_HEADERS.join(", ")} is required for private Storefront API clients`,
+  );
 }

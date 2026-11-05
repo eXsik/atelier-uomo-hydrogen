@@ -1,8 +1,15 @@
-import { gql, type StorefrontApi, type StorefrontClient } from "@shopify/hydrogen";
+import {
+  gql,
+  type StorefrontApi,
+  type StorefrontClient,
+} from "@shopify/hydrogen";
 
-import { normalizeStorefrontShop, type StorefrontShop } from "~/lib/storefront-shop";
+import {
+  normalizeStorefrontShop,
+  type StorefrontShop,
+} from "~/lib/storefront-shop";
 
-export const ROOT_LAYOUT_QUERY = gql(`
+const ROOT_LAYOUT_QUERY = gql(`
   query RootLayout($country: CountryCode, $language: LanguageCode)
   @inContext(country: $country, language: $language) {
     shop {
@@ -34,7 +41,9 @@ export const ROOT_LAYOUT_QUERY = gql(`
   }
 `);
 
-export type RootLayoutQueryResult = StorefrontApi.ResultOf<typeof ROOT_LAYOUT_QUERY>;
+export type RootLayoutQueryResult = StorefrontApi.ResultOf<
+  typeof ROOT_LAYOUT_QUERY
+>;
 
 type RootLayoutLoaderData = {
   shopId: string;

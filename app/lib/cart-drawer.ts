@@ -6,7 +6,11 @@ let openCartActionConfigured = false;
 let openCartActionRetryQueued = false;
 
 function getDialog(id: string): HTMLDialogElement | null {
-  if (typeof document === "undefined" || typeof HTMLDialogElement === "undefined") return null;
+  if (
+    typeof document === "undefined" ||
+    typeof HTMLDialogElement === "undefined"
+  )
+    return null;
   const dialog = document.getElementById(id);
   return dialog instanceof HTMLDialogElement ? dialog : null;
 }
@@ -14,17 +18,18 @@ function getDialog(id: string): HTMLDialogElement | null {
 function supportsDialogCommands(): boolean {
   if (typeof HTMLButtonElement === "undefined") return false;
   return (
-    "command" in HTMLButtonElement.prototype && "commandForElement" in HTMLButtonElement.prototype
+    "command" in HTMLButtonElement.prototype &&
+    "commandForElement" in HTMLButtonElement.prototype
   );
 }
 
-export function openDialog(id: string): void {
+function openDialog(id: string): void {
   const dialog = getDialog(id);
   if (!dialog || dialog.open) return;
   dialog.showModal();
 }
 
-export function closeDialog(id: string): void {
+function closeDialog(id: string): void {
   getDialog(id)?.close();
 }
 
@@ -34,10 +39,6 @@ export function openCartDrawer(): void {
 
 export function closeCartDrawer(): void {
   closeDialog(CART_DRAWER_ID);
-}
-
-export function openMobileNavDrawer(): void {
-  openDialog(MOBILE_NAV_DRAWER_ID);
 }
 
 export function closeMobileNavDrawer(): void {
@@ -53,14 +54,18 @@ export function openDialogFallback(id: string): void {
   openDialog(id);
 }
 
-type LinkClick = Pick<MouseEvent, "button" | "metaKey" | "ctrlKey" | "shiftKey" | "altKey"> & {
+type LinkClick = Pick<
+  MouseEvent,
+  "button" | "metaKey" | "ctrlKey" | "shiftKey" | "altKey"
+> & {
   preventDefault(): void;
 };
 
 // Only a plain left click on an existing dialog is intercepted, so the href
 // still works without JavaScript and for open-in-new-tab clicks.
 export function openDialogFromLinkClick(event: LinkClick, id: string): void {
-  const isModifiedClick = event.metaKey || event.ctrlKey || event.shiftKey || event.altKey;
+  const isModifiedClick =
+    event.metaKey || event.ctrlKey || event.shiftKey || event.altKey;
   if (event.button !== 0 || isModifiedClick) return;
   if (!getDialog(id)) return;
   event.preventDefault();
@@ -68,7 +73,10 @@ export function openDialogFromLinkClick(event: LinkClick, id: string): void {
 }
 
 function configureOpenCartActionNow(): boolean {
-  const openCart = typeof window !== "undefined" ? window.Shopify?.actions?.openCart : undefined;
+  const openCart =
+    typeof window !== "undefined"
+      ? window.Shopify?.actions?.openCart
+      : undefined;
   if (!openCart) return false;
 
   openCart.configure({

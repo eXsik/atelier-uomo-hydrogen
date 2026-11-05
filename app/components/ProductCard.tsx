@@ -64,7 +64,7 @@ export function ProductCard({ product, priority = false }: ProductCardProps) {
       aria-label={product.title}
       data-testid="product-card"
     >
-      <div className="product-editorial-image rounded-card bg-surface-secondary relative block aspect-square overflow-hidden">
+      <div className="product-editorial-image relative block aspect-square overflow-hidden rounded-card bg-surface-secondary">
         {primaryImage ? (
           <div className="h-full w-full motion-safe:transition-transform motion-safe:duration-300 motion-safe:group-hover:scale-[1.04]">
             <img
@@ -95,25 +95,28 @@ export function ProductCard({ product, priority = false }: ProductCardProps) {
         ) : null}
       </div>
       <div className="flex flex-col gap-0.5 text-left">
-        <h3 className="type-body-sm text-on-surface line-clamp-2 font-medium">
-          <Link to={`/products/${product.handle}`} className="card-link text-on-surface">
+        <h3 className="type-body-sm line-clamp-2 font-medium text-on-surface">
+          <Link
+            to={`/products/${product.handle}`}
+            className="card-link text-on-surface"
+          >
             {product.title}
           </Link>
         </h3>
         <div className="inline-flex flex-wrap items-baseline gap-2 text-sm">
           {onSale ? (
             <>
-              <span className="text-sale font-medium">
+              <span className="font-medium text-sale">
                 <span className="sr-only">Sale price: </span>
                 {formatPrice(price)}
               </span>
-              <s className="text-compare text-sm">
+              <s className="text-sm text-compare">
                 <span className="sr-only">Regular price: </span>
                 {formatPrice(compareAt)}
               </s>
             </>
           ) : (
-            <span className="text-on-surface font-medium">
+            <span className="font-medium text-on-surface">
               <span className="sr-only">Price: </span>
               {formatPrice(price)}
             </span>

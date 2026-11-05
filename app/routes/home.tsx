@@ -1,11 +1,21 @@
 import { gql } from "@shopify/hydrogen";
 import { Link } from "react-router";
 
-import { COLLECTION_CARD_FRAGMENT, type CollectionCardData } from "~/components/CollectionCard";
+import {
+  COLLECTION_CARD_FRAGMENT,
+  type CollectionCardData,
+} from "~/components/CollectionCard";
 import { HomeHero } from "~/components/HomeHero";
-import { ProductCard, PRODUCT_CARD_FRAGMENT, type ProductCardData } from "~/components/ProductCard";
+import {
+  ProductCard,
+  PRODUCT_CARD_FRAGMENT,
+  type ProductCardData,
+} from "~/components/ProductCard";
 import { storefrontClientContext } from "~/lib/storefront";
-import { formatPageTitle, getShopNameFromRootMatch } from "~/lib/storefront-shop";
+import {
+  formatPageTitle,
+  getShopNameFromRootMatch,
+} from "~/lib/storefront-shop";
 
 import type { Route } from "./+types/home";
 
@@ -64,7 +74,8 @@ export async function loader({ context }: Route.LoaderArgs) {
   // New arrivals: the most recently created products (by creation date, not
   // publication date), newest first, in the order the Storefront API returns.
   const featuredProducts: ProductCardData[] = data?.products.nodes ?? [];
-  const featuredCollections: CollectionCardData[] = data?.collections.nodes ?? [];
+  const featuredCollections: CollectionCardData[] =
+    data?.collections.nodes ?? [];
   // The hero features the most recently updated collection, independent of the
   // category list above.
   const heroCollections = data?.heroCollections.nodes ?? [];
@@ -89,7 +100,7 @@ function NewArrivals({ products }: { products: readonly ProductCardData[] }) {
         </h2>
         <Link
           to="/collections"
-          className="min-h-touch-target text-on-surface focus-visible:outline-accent inline-flex items-center gap-1 rounded-sm text-sm font-normal no-underline hover:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 motion-safe:transition-opacity"
+          className="inline-flex min-h-touch-target items-center gap-1 rounded-sm text-sm font-normal text-on-surface no-underline hover:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent motion-safe:transition-opacity"
         >
           <span>Explore all collections</span>
           <span
@@ -127,10 +138,17 @@ function NewArrivals({ products }: { products: readonly ProductCardData[] }) {
   );
 }
 
-function CollectionIndex({ collections }: { collections: readonly CollectionCardData[] }) {
+function CollectionIndex({
+  collections,
+}: {
+  collections: readonly CollectionCardData[];
+}) {
   if (!collections.length) return null;
   return (
-    <section className="collection-index page-shell" aria-labelledby="category-heading">
+    <section
+      className="collection-index page-shell"
+      aria-labelledby="category-heading"
+    >
       <div className="collection-intro">
         <p className="editorial-kicker">Find your perspective</p>
         <h2 id="category-heading" className="editorial-heading">
@@ -164,7 +182,10 @@ export default function Home({ loaderData }: Route.ComponentProps) {
     <main className="flex-1" id="main-content" tabIndex={-1}>
       <HomeHero />
       <NewArrivals products={loaderData.featuredProducts} />
-      <section className="atelier-manifesto" aria-labelledby="manifesto-heading">
+      <section
+        className="atelier-manifesto"
+        aria-labelledby="manifesto-heading"
+      >
         <div className="page-shell manifesto-layout">
           <p className="editorial-kicker">The Atelier perspective</p>
           <h2 id="manifesto-heading">
@@ -173,8 +194,8 @@ export default function Home({ loaderData }: Route.ComponentProps) {
             Keep it that way.
           </h2>
           <p>
-            Familiar pieces. Unexpected combinations. We see a wardrobe as something to live in,
-            rather than something to follow.
+            Familiar pieces. Unexpected combinations. We see a wardrobe as
+            something to live in, rather than something to follow.
           </p>
         </div>
       </section>

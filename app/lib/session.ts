@@ -19,7 +19,9 @@ export async function createRequestSessionManager(
     path: "/",
     secrets: [secret],
   });
-  const session = await sessionStorage.read(await cookie.parse(request.headers.get("cookie")));
+  const session = await sessionStorage.read(
+    await cookie.parse(request.headers.get("cookie")),
+  );
   const origin = new URL(request.url).origin;
 
   return {
@@ -31,13 +33,20 @@ export async function createRequestSessionManager(
       if (session.dirty && session.size === 0) session.destroy();
       const value = await sessionStorage.save(session);
       if (value === null) return;
-      return { "set-cookie": await cookie.serialize(value, value === "" ? { maxAge: 0 } : {}) };
+      return {
+        "set-cookie": await cookie.serialize(
+          value,
+          value === "" ? { maxAge: 0 } : {},
+        ),
+      };
     },
   };
 }
 
 /** In-memory session for requests without Customer Accounts configured. */
-export function createEphemeralSessionManager(request: Request): WritableCustomerSessionManager {
+export function createEphemeralSessionManager(
+  request: Request,
+): WritableCustomerSessionManager {
   const data = new Map<string, unknown>();
   const origin = new URL(request.url).origin;
 

@@ -5,7 +5,9 @@ import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "vite";
 
 const oxygenPlugins = oxygen();
-const oxygenPlugin = oxygenPlugins.find((plugin) => plugin.name === "oxygen:main");
+const oxygenPlugin = oxygenPlugins.find(
+  (plugin) => plugin.name === "oxygen:main",
+);
 const enabled = process.env.npm_lifecycle_event === "dev:https";
 const httpsOptions = { enabled };
 
@@ -19,7 +21,12 @@ if (!oxygenPlugin?.api) {
 oxygenPlugin.api.registerPluginOptions({ compatibilityDate: "2026-04-01" });
 
 export default defineConfig({
-  plugins: [localHttps(httpsOptions), tailwindcss(), ...oxygenPlugins, reactRouter()],
+  plugins: [
+    localHttps(httpsOptions),
+    tailwindcss(),
+    ...oxygenPlugins,
+    reactRouter(),
+  ],
   resolve: {
     tsconfigPaths: true,
   },

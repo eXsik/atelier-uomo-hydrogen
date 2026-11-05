@@ -21,7 +21,9 @@ export type CustomerAccount = {
 };
 
 // `null` when Customer Accounts are unavailable (see `createRequestCustomerAccount`).
-export const customerAccountContext = createContext<CustomerAccount | null>(null);
+export const customerAccountContext = createContext<CustomerAccount | null>(
+  null,
+);
 
 // Reused across requests so concurrent token refreshes for the same customer
 // share one request to Shopify.
@@ -47,12 +49,21 @@ export async function createRequestCustomerAccount(
     PUBLIC_CUSTOMER_ACCOUNT_API_CLIENT_ID: customerAccountApiClientId,
     SESSION_SECRET: sessionSecret,
   } = env;
-  if (shouldUseMockShop(env) || !shopId || !customerAccountApiClientId || !sessionSecret) return;
+  if (
+    shouldUseMockShop(env) ||
+    !shopId ||
+    !customerAccountApiClientId ||
+    !sessionSecret
+  )
+    return;
   if (new URL(request.url).protocol !== "https:") return;
 
   const key = `${shopId}:${customerAccountApiClientId}`;
   if (cached?.key !== key) {
-    const session = createCustomerSession({ shopId, customerAccountApiClientId });
+    const session = createCustomerSession({
+      shopId,
+      customerAccountApiClientId,
+    });
     const handlers = createCustomerAccountServerHandlers({
       customerSession: session,
       defaultPostLoginRedirectPathname: "/account",

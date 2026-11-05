@@ -16,7 +16,9 @@ export default {
       const request = toPublicRequest(rawRequest);
       const method = request.method;
       if ((method === "GET" || method === "HEAD") && request.body) {
-        return new Response(`${method} requests cannot have a body`, { status: 400 });
+        return new Response(`${method} requests cannot have a body`, {
+          status: 400,
+        });
       }
 
       const url = new URL(request.url);
@@ -31,9 +33,13 @@ export default {
       routerContext.cache = await caches.open("hydrogen-v1");
       routerContext.set(envContext, env);
       routerContext.env = env;
-      routerContext.waitUntil = executionContext.waitUntil.bind(executionContext);
+      routerContext.waitUntil =
+        executionContext.waitUntil.bind(executionContext);
 
-      const handleRequest = createRequestHandler(serverBuild, process.env.NODE_ENV);
+      const handleRequest = createRequestHandler(
+        serverBuild,
+        process.env.NODE_ENV,
+      );
       return handleRequest(request, routerContext as never);
     } catch (error) {
       console.error(error);
@@ -47,7 +53,10 @@ export default {
 // `https:` origin.
 function toPublicRequest(request: Request): Request {
   const url = new URL(request.url);
-  if (url.protocol !== "http:" || request.headers.get("x-forwarded-proto") !== "https") {
+  if (
+    url.protocol !== "http:" ||
+    request.headers.get("x-forwarded-proto") !== "https"
+  ) {
     return request;
   }
   url.protocol = "https:";

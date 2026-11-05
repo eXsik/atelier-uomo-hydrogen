@@ -45,6 +45,8 @@ The default catalog uses mock.shop and requires no Shopify account or API token.
 ## Checks
 
 ```bash
+npm run format:check
+npm run knip
 npm run typecheck
 node --experimental-strip-types tests/checkout.test.ts
 npm run build
@@ -73,12 +75,15 @@ npm run test:e2e:ui
 npm run test:e2e:report
 ```
 
-The four browser scenarios cover:
+The seven browser scenarios cover:
 
 1. Homepage → collection → product navigation.
 2. Cart quantity updates, persistence after reload, removal, and checkout URL.
 3. Search results → product navigation.
 4. Mobile menu → collections navigation.
+5. Facet selection, active-filter removal, and clearing all filters while preserving search parameters.
+6. Price-range filters and persistence after reload.
+7. Search sorting without JavaScript while preserving search parameters.
 
 Cart tests verify server state as well as the optimistic interface.
 
@@ -91,6 +96,7 @@ Four unit tests cover the mock checkout URL helper, including query parameter pr
 The GitHub Actions workflow is configured to run:
 
 - Dependency installation with `npm ci`
+- Formatting and unused-code checks
 - TypeScript and GraphQL checks
 - Checkout unit tests
 - Production build
@@ -130,7 +136,6 @@ The application is based on Shopify’s Hydrogen React Router template. Custom w
 - Customer Account login requires a real Shopify store.
 - The sample catalog is not yet fully curated for a menswear brand.
 - Prices and currency follow API data.
-- An intermittent empty-cart result was observed during testing; failure traces are retained to support further diagnosis.
 - Development dependencies and runtime compatibility require continued review before production use.
 
 ## Known warnings

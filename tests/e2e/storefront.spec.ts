@@ -25,10 +25,7 @@ test("customer can browse from home to a product", async ({ page }) => {
 
   await expect(page).toHaveURL(/\/collections\/[^/?]+/);
 
-  const product = main
-    .getByTestId("product-card")
-    .first()
-    .getByRole("link");
+  const product = main.getByTestId("product-card").first().getByRole("link");
 
   await expect(product).toBeVisible();
   const productName = (await product.innerText()).trim();
@@ -41,17 +38,18 @@ test("customer can browse from home to a product", async ({ page }) => {
   ).toBeVisible();
 });
 
-test("customer can update, persist and remove a cart item", async ({ page }) => {
+test("customer can update, persist and remove a cart item", async ({
+  page,
+}) => {
   await page.goto("/products/hoodie");
 
-  await page
-    .getByRole("button", { name: "Add to cart", exact: true })
-    .click();
+  await page.getByRole("button", { name: "Add to cart", exact: true }).click();
 
   const drawer = page.getByRole("dialog", { name: "Cart", exact: true });
   await expect(drawer).toBeVisible();
-  await expect(drawer.getByRole("textbox", { name: "Quantity", exact: true }))
-    .toHaveValue("1");
+  await expect(
+    drawer.getByRole("textbox", { name: "Quantity", exact: true }),
+  ).toHaveValue("1");
 
   const [updateResponse] = await Promise.all([
     page.waitForResponse(
@@ -59,29 +57,31 @@ test("customer can update, persist and remove a cart item", async ({ page }) => 
         new URL(response.url()).pathname === "/api/cart" &&
         response.request().method() === "POST",
     ),
-    drawer
-      .getByRole("button", { name: /^Increase quantity for / })
-      .click(),
+    drawer.getByRole("button", { name: /^Increase quantity for / }).click(),
   ]);
 
   expect(updateResponse.ok()).toBeTruthy();
 
   // Confirm the saved server state, not just the optimistic UI.
   await expect
-    .poll(async () => {
-      const response = await page.request.get("/api/cart");
-      expect(response.ok()).toBeTruthy();
+    .poll(
+      async () => {
+        const response = await page.request.get("/api/cart");
+        expect(response.ok()).toBeTruthy();
 
-      const data = await response.json();
-      return data.cart?.totalQuantity;
-    }, {
-      message: "Server should persist two cart items",
-      timeout: 10_000,
-    })
+        const data = await response.json();
+        return data.cart?.totalQuantity;
+      },
+      {
+        message: "Server should persist two cart items",
+        timeout: 10_000,
+      },
+    )
     .toBe(2);
 
-  await expect(drawer.getByRole("textbox", { name: "Quantity", exact: true }))
-    .toHaveValue("2");
+  await expect(
+    drawer.getByRole("textbox", { name: "Quantity", exact: true }),
+  ).toHaveValue("2");
 
   await expect(
     page.getByRole("link", { name: "Cart (2 items)", exact: true }),
@@ -94,8 +94,9 @@ test("customer can update, persist and remove a cart item", async ({ page }) => 
   await page.getByTestId("cart-trigger").click();
 
   await expect(drawer).toBeVisible();
-  await expect(drawer.getByRole("textbox", { name: "Quantity", exact: true }))
-    .toHaveValue("2");
+  await expect(
+    drawer.getByRole("textbox", { name: "Quantity", exact: true }),
+  ).toHaveValue("2");
 
   // Verify the checkout handoff without navigating to a third-party website.
   const checkout = drawer.getByRole("link", {
@@ -117,16 +118,19 @@ test("customer can update, persist and remove a cart item", async ({ page }) => 
   expect(removeResponse.ok()).toBeTruthy();
 
   await expect
-    .poll(async () => {
-      const response = await page.request.get("/api/cart");
-      expect(response.ok()).toBeTruthy();
+    .poll(
+      async () => {
+        const response = await page.request.get("/api/cart");
+        expect(response.ok()).toBeTruthy();
 
-      const data = await response.json();
-      return data.cart?.totalQuantity;
-    }, {
-      message: "Server should persist an empty cart",
-      timeout: 10_000,
-    })
+        const data = await response.json();
+        return data.cart?.totalQuantity;
+      },
+      {
+        message: "Server should persist an empty cart",
+        timeout: 10_000,
+      },
+    )
     .toBe(0);
 
   await expect(
@@ -171,9 +175,7 @@ test("mobile menu navigates to collections", async ({ page }) => {
   const menu = page.getByTestId("mobile-nav");
   await expect(menu).toBeVisible();
 
-  await menu
-    .getByRole("link", { name: "The collection", exact: true })
-    .click();
+  await menu.getByRole("link", { name: "The collection", exact: true }).click();
 
   await expect(page).toHaveURL(/\/collections\/?$/);
   await expect(menu).not.toBeVisible();

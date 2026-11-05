@@ -1,30 +1,12 @@
-import type { ReactElement } from "react";
-
-interface Announcement {
-  content: ReactElement;
-}
-
-// Add announcements as JSX elements here.
-const ANNOUNCEMENTS: Announcement[] = [];
-
-export function AnnouncementBar() {
-  if (ANNOUNCEMENTS.length === 0) return null;
-
+export function AnnouncementBar({ isDemo }: { isDemo: boolean }) {
+  if (!isDemo) return null;
   return (
-    <div
-      role="region"
-      aria-label="Announcement"
-      className="bg-on-surface px-margin py-2.5 text-center"
+    <aside
+      aria-label="Demo store"
+      className="bg-on-surface px-margin py-2 text-center text-xs text-surface"
     >
-      <ul role="list">
-        {ANNOUNCEMENTS.map((announcement, index) => (
-          <AnnouncementBarItem key={index} {...announcement} />
-        ))}
-      </ul>
-    </div>
+      Portfolio storefront · Demo catalog by mock.shop · No real payments or
+      orders
+    </aside>
   );
-}
-
-function AnnouncementBarItem({ content }: Announcement) {
-  return <li className="type-body-sm text-surface wrap-anywhere">{content}</li>;
 }

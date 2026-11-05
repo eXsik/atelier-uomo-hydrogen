@@ -85,3 +85,71 @@ body:has(.drawer-right[open]),
 body:has(.drawer-left[open]) {
   overflow: hidden;
 }
+
+/* Atelier Uomo: quiet typography, forest green, and an editorial split hero. */
+.brand-wordmark {
+  font-family: Georgia, "Times New Roman", serif;
+  letter-spacing: -0.035em;
+}
+.atelier-hero {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(2rem, 6vw, 6rem);
+  padding-block: clamp(2rem, 5vw, 5rem);
+  align-items: center;
+}
+.atelier-hero-copy {
+  padding-block: 2rem;
+}
+.atelier-hero h1 {
+  font-family: var(--font-heading);
+  font-size: clamp(3rem, 5.5vw, 5.5rem);
+  line-height: 1.04;
+  letter-spacing: -0.045em;
+  max-width: 10ch;
+  margin-block: 1.5rem;
+  text-wrap: balance;
+}
+.atelier-hero-description {
+  max-width: 34ch;
+  line-height: 1.75;
+  margin-bottom: 2rem;
+  color: var(--color-on-surface-secondary);
+}
+.atelier-hero-image {
+  display: block;
+  position: relative;
+  min-width: 0;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+}
+.atelier-hero-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.atelier-hero-caption {
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem;
+  right: 1rem;
+  padding: 1rem;
+  color: var(--color-on-surface);
+  background: var(--color-surface);
+  font-size: 0.875rem;
+}
+@media (max-width: 767px) {
+  .atelier-hero {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  .atelier-hero-copy {
+    padding-block: 0;
+  }
+  .atelier-hero h1 {
+    font-size: clamp(3rem, 11vw, 4.5rem);
+  }
+  .atelier-hero-image {
+    aspect-ratio: 5 / 4;
+  }
+}

@@ -2,7 +2,11 @@ import { useState } from "react";
 import { Link } from "react-router";
 
 import { useCart } from "~/lib/cart";
-import { CART_DRAWER_ID, SEARCH_DRAWER_ID, openDialogFromLinkClick } from "~/lib/cart-drawer";
+import {
+  CART_DRAWER_ID,
+  SEARCH_DRAWER_ID,
+  openDialogFromLinkClick,
+} from "~/lib/cart-drawer";
 import type { StorefrontShop } from "~/lib/storefront-shop";
 
 import { MobileNav, MobileNavTrigger } from "./MobileNav";
@@ -31,14 +35,17 @@ export function Header({ shopInfo }: { shopInfo: StorefrontShop }) {
         data-header-nav-group
       >
         <div className="flex min-w-0 flex-1 items-center gap-2 pe-3 md:max-w-48 md:flex-none md:pe-0">
-          <div className="-ms-2 hidden shrink-0 max-md:block" data-hamburger-wrapper>
+          <div
+            className="-ms-2 hidden shrink-0 max-md:block"
+            data-hamburger-wrapper
+          >
             <MobileNavTrigger />
           </div>
           <Link
             to="/"
             aria-label={shopInfo.name}
             title={shopInfo.name}
-            className="text-on-surface focus-visible:outline-accent inline-flex max-w-48 min-w-0 items-center rounded-sm text-lg font-medium no-underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+            className="text-on-surface focus-visible:outline-accent inline-flex max-w-48 min-w-0 items-center rounded-sm brand-wordmark text-lg font-medium no-underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
           >
             {logo && failedLogoUrl !== logo.url ? (
               <img
@@ -49,12 +56,15 @@ export function Header({ shopInfo }: { shopInfo: StorefrontShop }) {
                 className="h-auto max-h-10 w-auto max-w-full object-contain"
                 // An SSR image can fail before hydration attaches onError, so also check on mount.
                 ref={(img) => {
-                  if (img?.complete && img.naturalWidth === 0) setFailedLogoUrl(logo.url);
+                  if (img?.complete && img.naturalWidth === 0)
+                    setFailedLogoUrl(logo.url);
                 }}
                 onError={() => setFailedLogoUrl(logo.url)}
               />
             ) : (
-              <span className="line-clamp-2 leading-tight wrap-anywhere">{shopInfo.name}</span>
+              <span className="line-clamp-2 leading-tight wrap-anywhere">
+                {shopInfo.name}
+              </span>
             )}
           </Link>
         </div>
@@ -80,16 +90,28 @@ export function Header({ shopInfo }: { shopInfo: StorefrontShop }) {
             aria-controls={SEARCH_DRAWER_ID}
             aria-haspopup="dialog"
             data-testid="search-trigger"
-            onClick={(event) => openDialogFromLinkClick(event, SEARCH_DRAWER_ID)}
+            onClick={(event) =>
+              openDialogFromLinkClick(event, SEARCH_DRAWER_ID)
+            }
           >
-            <img src="/icons/icon-search.svg" alt="" className="size-5" aria-hidden="true" />
+            <img
+              src="/icons/icon-search.svg"
+              alt=""
+              className="size-5"
+              aria-hidden="true"
+            />
           </Link>
           <Link
             to="/account"
             className="text-on-surface focus-visible:outline-accent inline-flex h-11 w-11 items-center justify-center rounded hover:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 motion-safe:transition-opacity"
             aria-label="Account"
           >
-            <img src="/icons/icon-user.svg" alt="" className="size-5" aria-hidden="true" />
+            <img
+              src="/icons/icon-user.svg"
+              alt=""
+              className="size-5"
+              aria-hidden="true"
+            />
           </Link>
           <Link
             to="/cart"

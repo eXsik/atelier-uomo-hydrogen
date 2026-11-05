@@ -9,9 +9,9 @@
 
 @theme {
   /* Surfaces */
-  --color-surface: #ffffff;
-  --color-surface-secondary: #e3e3e3;
-  --color-on-surface: #000000;
+  --color-surface: #fcfcfa;
+  --color-surface-secondary: #eceeea;
+  --color-on-surface: #182b29;
   --color-on-surface-secondary: #6b7280;
   --color-border: #e5e7eb;
 
@@ -23,20 +23,30 @@
      shades, and relative-color oklch() for the softer accent tint. Nothing
      hard-codes the burgundy a second time, so the whole UI re-harmonizes from
      this one knob. */
-  --color-primary: #5d0707;
+  --color-primary: #23463e;
 
   /* Interactive — derived from --color-primary.
      -hover and -active are the brand darkened one and two steps in oklab; this
      is the ONLY place the pressed/hover brand shades are defined. */
   --color-interactive: var(--color-primary);
-  --color-interactive-hover: color-mix(in oklab, var(--color-primary) 85%, black);
-  --color-interactive-active: color-mix(in oklab, var(--color-primary) 72%, black);
+  --color-interactive-hover: color-mix(
+    in oklab,
+    var(--color-primary) 85%,
+    black
+  );
+  --color-interactive-active: color-mix(
+    in oklab,
+    var(--color-primary) 72%,
+    black
+  );
   --color-interactive-text: #ffffff;
 
   /* Accent — a lighter, desaturated tint of the brand, used for focus rings
      and the accent badge. Relative-color oklch: lift lightness, cut chroma to
      ~40%, ease the hue a touch. Tracks --color-primary automatically. */
-  --color-accent: oklch(from var(--color-primary) calc(l + 0.17) calc(c * 0.39) calc(h - 9));
+  --color-accent: oklch(
+    from var(--color-primary) calc(l + 0.17) calc(c * 0.39) calc(h - 9)
+  );
 
   /* Button variants — every brand button maps onto the interactive ramp, so
      they share one hover/active definition rather than re-deriving shades. */
@@ -85,7 +95,7 @@
 
   /* Typography: locked to system-ui for examples. */
   --font-body: system-ui, -apple-system, sans-serif;
-  --font-heading: system-ui, -apple-system, sans-serif;
+  --font-heading: Georgia, "Times New Roman", serif;
 
   /* Easing */
   --ease-ui: cubic-bezier(0.16, 1, 0.3, 1);
@@ -120,7 +130,8 @@
   /* Shadows */
   --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
   --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-lg:
+    0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
   --shadow-xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
 
   /* Aspect ratios */
@@ -311,7 +322,10 @@
     block-size: var(--spacing-filter-swatch);
     inline-size: var(--spacing-filter-swatch);
     border-radius: var(--radius-badge);
-    background: var(--filter-swatch-color, var(--swatch-color, var(--color-surface)));
+    background: var(
+      --filter-swatch-color,
+      var(--swatch-color, var(--color-surface))
+    );
   }
   .filter-checkbox[aria-checked="true"],
   .filter-checkbox[aria-pressed="true"],
@@ -412,7 +426,12 @@
     outline-offset: 2px;
   }
   @media (hover: hover) {
-    .option-pill:not([aria-pressed="true"], [aria-current="true"], .is-selected, :disabled):hover {
+    .option-pill:not(
+        [aria-pressed="true"],
+        [aria-current="true"],
+        .is-selected,
+        :disabled
+      ):hover {
       background: var(--color-surface-secondary);
     }
   }
@@ -845,13 +864,19 @@
 }
 
 @utility bleed-full {
-  margin-inline: calc(-1 * var(--spacing-margin) - max(0px, (100vw - var(--spacing-page)) / 2));
-  width: calc(100% + 2 * var(--spacing-margin) + max(0px, 100vw - var(--spacing-page)));
+  margin-inline: calc(
+    -1 * var(--spacing-margin) - max(0px, (100vw - var(--spacing-page)) / 2)
+  );
+  width: calc(
+    100% + 2 * var(--spacing-margin) + max(0px, 100vw - var(--spacing-page))
+  );
 }
 
 @utility gallery-bleed-start {
   margin-inline-start: calc(
     -1 * var(--spacing-margin) - max(0px, (100vw - var(--spacing-page)) / 2)
   );
-  width: calc(100% + var(--spacing-margin) + max(0px, (100vw - var(--spacing-page)) / 2));
+  width: calc(
+    100% + var(--spacing-margin) + max(0px, (100vw - var(--spacing-page)) / 2)
+  );
 }

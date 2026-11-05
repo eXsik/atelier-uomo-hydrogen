@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { publishCartViewed } from "~/components/AnalyticsTrackers";
 import { CartLineItem } from "~/components/CartDrawer";
 import { useCart } from "~/lib/cart";
+import { getMockCheckoutUrl } from "~/lib/checkout";
 import { formatPrice } from "~/lib/money";
 import { formatPageTitle, getShopNameFromRootMatch } from "~/lib/storefront-shop";
 
@@ -17,6 +18,8 @@ export default function CartRoute() {
   const cart = useCart((state) => state.data);
   const loading = useCart((state) => state.loading);
   const lines = cart.lines.nodes;
+  const mockCheckoutUrl = getMockCheckoutUrl(cart);
+  const checkoutUrl = mockCheckoutUrl ?? cart.checkoutUrl;
 
   useEffect(() => {
     publishCartViewed(cart);
@@ -57,11 +60,11 @@ export default function CartRoute() {
             <p className="text-on-surface-secondary mt-3 text-xs">
               Taxes and shipping calculated at checkout
             </p>
-            {cart.checkoutUrl ? (
+            {checkoutUrl ? (
               <div className="mt-4 grid gap-3">
-                <ShopPayButton width="100%" borderRadius="8px" />
+                <ShopPayButton checkoutUrl={mockCheckoutUrl} width="100%" borderRadius="8px" />
                 <a
-                  href={cart.checkoutUrl}
+                  href={checkoutUrl}
                   className="rounded-button button-primary focus-visible:outline-accent inline-flex h-11 w-full items-center justify-center gap-2 px-4 text-sm font-medium no-underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 motion-safe:transition-[color,background-color,border-color,transform] motion-safe:active:scale-[0.97]"
                 >
                   Checkout

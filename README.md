@@ -1,141 +1,66 @@
-# Hydrogen React Router template
+# Atelier Uomo
 
-[![Deploy to Oxygen](../../.github/images/deploy-to-oxygen.svg)](https://admin.shopify.com/hydrogen/new?template=react-router)
+A menswear storefront portfolio project built with React, TypeScript, React Router SSR, Shopify Hydrogen 2026.10, and Tailwind CSS 4.
 
-A React Router 7 (framework mode, SSR) storefront built on
-[`@shopify/hydrogen`](https://www.npmjs.com/package/@shopify/hydrogen) and the
-Oxygen runtime through Vite and Mini Oxygen. It's a starting point you can clone
-and build your store on top of — five pages on a shared layout, with a real cart,
-analytics, and a consent banner wired up.
+The catalog, availability, prices, collections, search, and cart use the public mock.shop Storefront API. Product data is demonstrative; checkout does not take real payments or create real orders. Customer Account login requires a real Shopify store and is unavailable with mock.shop.
 
-## Pages
+## Local development
 
-- `/` — home (editorial hero, new arrivals, shop by category)
-- `/products/:handle` — product detail (gallery, variants, add to cart, Shop Pay)
-- `/collections` — all collections
-- `/collections/:handle` — collection with filters, sort, and pagination
-- `/search` — product search with the same filtering (also the no-JS fallback for the
-  predictive search drawer)
-- `/cart` — cart with Shop Pay (also the no-JS fallback for the cart drawer)
-- `/account` — Customer Account sign-in, log out, and order history
-
-## What it demonstrates
-
-- Server `loader`s as the data path; each route owns its GraphQL query (typed via
-  `gql.tada`).
-- A real cart: storefront client + request handlers + `/api/cart` + an accessible
-  cart drawer wired to Shopify Standard Actions.
-- A shared layout (header with mobile nav, footer, optional announcement bar).
-- Predictive search: Hydrogen's `/api/predictive-search` handler + an accessible
-  search drawer that suggests products as you type and falls back to the
-  `/search` page without JavaScript.
-- Analytics + a consent banner.
-- Customer Accounts: Hydrogen's `/account/login`, `/account/authorize`,
-  `/account/refresh`, and `/account/logout` handlers, backed by a signed cookie
-  session (`app/lib/session.ts`). Needs a real store, `SHOP_ID`,
-  `PUBLIC_CUSTOMER_ACCOUNT_API_CLIENT_ID`, `SESSION_SECRET`, and HTTPS.
-- The design tokens in `app/tokens.css` and SVG icons in `public/icons/`.
-
-## Run it
-
-Requires Node.js 22 (22.12 or later) or Node.js 24.
+Use Node.js 24 (`nvm use` reads `.nvmrc`) and npm.
 
 ```bash
-npm install
-```
-
-**Zero-config demo** — runs against `mock.shop` (a public mock Storefront API, no
-account or token needed):
-
-```bash
-cp .env.example .env
-# uncomment MOCK_SHOP=1 in .env
+npm ci
 npm run dev
 ```
 
-`mock.shop` is a catalog of fictional stores, each on its own host. The default at
-`mock.shop` sells apparel basics; the directory at
-[mock.shop/llms.txt](https://mock.shop/llms.txt) lists every other store with what it
-sells. To build against one of them, set `PUBLIC_STORE_DOMAIN` to its host (for
-example `pets.mock.shop`) and leave the token empty.
+Open the address printed by Vite. The default mock.shop catalog requires no account, token, or `.env` file. Optional configuration is documented in `.env.example`. Never commit real credentials; `.env` and its local variants are ignored.
 
-**Against a real store** — link a Hydrogen storefront and pull its environment
-variables into `.env`, then run normally:
+## Checks
 
 ```bash
-npx shopify hydrogen link       # skip if the project is already linked
-npx shopify hydrogen env pull   # writes the storefront's variables to .env
-npm run dev                     # Vite/Mini Oxygen loads .env into the worker environment
+npm run typecheck
+npm run build
+npm run preview
 ```
 
-Oxygen creates `PUBLIC_STORE_DOMAIN`, `PUBLIC_STOREFRONT_ID`, and
-`PRIVATE_STOREFRONT_API_TOKEN` for a linked storefront, so you don't copy them by
-hand. If `env pull` reports secret values it couldn't pull, set those in `.env`. To
-use an existing **private** Storefront API token without linking, copy `.env.example`
-to `.env` and set `PUBLIC_STORE_DOMAIN` and `PRIVATE_STOREFRONT_API_TOKEN`.
-`PUBLIC_STOREFRONT_ID` is optional; providing it enables Shopify analytics for real
-stores.
+Typecheck runs React Router type generation, TypeScript, and Hydrogen GraphQL validation. Preview builds and serves the production bundle locally. There is no automated browser test suite yet; a passing build does not prove cart interactions.
 
-Customer Account OAuth requires trusted local HTTPS. Run:
+## Code map
 
-```bash
-npm run dev:https
-```
+- `app/root.tsx`: request middleware, shared layout, cart initialization, and storefront identity.
+- `app/routes/`: server loaders and page components for home, products, collections, search, cart, and account.
+- `app/components/`: shared UI, product cards, dialogs, header, footer, and editorial hero.
+- `app/lib/storefront.ts`: request-scoped Storefront API client.
+- `app/lib/shop.ts`: demo/real-store detection and Shopify runtime configuration.
+- `app/lib/cart*.ts`: cart state, handlers, and drawer helpers.
+- `app/lib/home-hero.ts`: picks an actual API collection and its image for the hero.
+- `app/tokens.css`: shared colors, type, spacing, and UI tokens.
+- `app/app.css`: application styling and responsive Atelier Uomo hero.
+- `server.ts`: Oxygen Worker entry point.
+- `vite.config.ts`: Vite, Tailwind, React Router, and MiniOxygen integration.
 
-Open <https://local.tryhydrogen.dev:5173>.
+Atelier Uomo owns the displayed brand identity. Product titles, prices, availability, images, and collection links continue to come from Shopify data. The default demo catalog contains multiple categories, including women's clothing; it is not yet a curated menswear catalog. Currency follows the API rather than being relabeled as PLN or EUR.
 
-The local HTTPS plugin provisions and reuses a trusted certificate under `~/.shopify/hydrogen/certs/` (on first run, it may prompt to install the local certificate authority), links an unlinked Hydrogen storefront, and pushes the Customer Account callback, JavaScript origin, and logout URLs. See the `hydrogen-local-https` skill for CI and manual fallback behavior.
+## Development stages
 
-Mode is **auto-detected**: when a `PRIVATE_STOREFRONT_API_TOKEN` is present the
-app talks to the real store (`PUBLIC_STORE_DOMAIN`, falling back to the default in
-`app/lib/shop.ts`); with none it falls back to the `mock.shop` demo, so a fresh
-deploy always renders. **On Oxygen, a linked storefront injects these env vars
-automatically** — the deployed site connects to your store with no extra config
-(and shows the `mock.shop` demo until it's linked). `MOCK_SHOP=1` forces mock, and so
-does a `mock.shop` host in `PUBLIC_STORE_DOMAIN`.
-(`mock.shop` and the Hydrogen Preview store are different data sources.)
+1. Establish the starter, Git baseline, and TypeScript/GraphQL checks.
+2. Introduce Atelier Uomo identity and a responsive homepage.
+3. Curate an appropriate demo menswear catalog and collection navigation.
+4. Verify product variants, add-to-cart, quantity updates, removal, and persistence in the browser.
+5. Improve collection/search browsing, empty states, and mobile accessibility.
+6. Add focused Playwright coverage for the core shopping flow and prepare metadata/social previews.
+7. Review dependency advisories, publish the GitHub repository, and deploy a verified demo.
 
-## Announcement bar (optional)
+## Security and deployment
 
-Add entries to `ANNOUNCEMENTS` in `app/components/AnnouncementBar.tsx`. An empty
-list hides the bar. Each entry's `content` is a React element, so it can include links:
+Run `npm audit` to inspect the current dependency tree. Do not use `npm audit fix --force` indiscriminately: npm may propose a breaking MiniOxygen downgrade. Review runtime and development dependencies separately with `npm audit --omit=dev`.
 
-```tsx
-import { Link } from "react-router";
+The current React Router dependency emits an `envFile` deprecation warning during development and checks. Updating the React Router 7 packages to 7.18.5 was attempted but npm reported a peer dependency resolution conflict; no dependency or lockfile changes were retained. The original 13 audit findings remain unresolved.
 
-const ANNOUNCEMENTS: Announcement[] = [
-  {
-    content: (
-      <p>
-        Discover our <Link to="/collections" className="underline">latest collections</Link>.
-      </p>
-    ),
-  },
-];
-```
+The starter includes a MiniOxygen compatibility-date workaround in `vite.config.ts`. Reassess it when updating the runtime. Do not deploy publicly before reviewing unresolved advisories and checking the production preview.
 
-You can connect metafields or a CMS later with your own data loading and rendering.
-No specific metafield format is required.
+A real Shopify store can be connected later with Shopify CLI. Customer Accounts additionally require HTTPS and the environment variables described in `.env.example`. Nothing is deployed or linked automatically by these local changes.
 
-## Scripts
+## Attribution
 
-| Script | Does |
-| --- | --- |
-| `npm run dev` | Start the Vite dev server with Mini Oxygen. |
-| `npm run dev:https` | Start the Vite dev server with trusted local HTTPS. |
-| `npm run build` | Production React Router build for Oxygen. |
-| `npm run preview` | Build and preview locally with Vite and Mini Oxygen. |
-| `npm run deploy` | Deploy to Oxygen with the Shopify CLI. |
-| `npm run typecheck` | React Router typegen + TypeScript + Hydrogen GraphQL checks. |
-
-## Where to start
-
-- Swap the store in `app/lib/shop.ts` + `.env`.
-- Routes live in `app/routes/`; shared UI in `app/components/`; data/query helpers
-  in `app/lib/`.
-- The design is yours to change — `app/tokens.css` holds the design tokens; the
-  components use them via semantic classes.
-
-## License
-
-MIT — see [LICENSE](./LICENSE).
+Based on Shopify's Hydrogen React Router template. MIT license; see `LICENSE`.

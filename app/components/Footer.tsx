@@ -14,7 +14,13 @@ export function Footer({ shopInfo }: { shopInfo: StorefrontShop }) {
         className={`border-border grid grid-cols-1 gap-8 border-t py-12 text-sm md:grid-cols-2 ${shopInfo.paymentMethods.length > 0 ? "lg:grid-cols-3" : ""}`}
       >
         <div className="min-w-0 wrap-anywhere">
-          <h2 className="type-body-sm text-on-surface mb-4 font-medium">{shopInfo.name}</h2>
+          <h2 className="type-body-sm text-on-surface mb-4 font-medium">
+            {shopInfo.name}
+          </h2>
+          <p className="text-on-surface-secondary max-w-xs leading-relaxed">
+            A study in everyday menswear. A portfolio storefront built with
+            Shopify Hydrogen.
+          </p>
         </div>
         <nav aria-labelledby="footer-customer-care-heading">
           <h2
@@ -30,8 +36,8 @@ export function Footer({ shopInfo }: { shopInfo: StorefrontShop }) {
               </Link>
             </li>
             <li>
-              <Link to="/account" className={linkClass}>
-                Account
+              <Link to="/cart" className={linkClass}>
+                Cart
               </Link>
             </li>
           </ul>
